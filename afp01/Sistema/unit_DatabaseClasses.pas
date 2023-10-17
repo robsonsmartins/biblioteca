@@ -6,7 +6,7 @@
 
   Contém as Classes de Dados da Aplicação
 
-  Data última revisão: 06/11/2001
+  Data última revisão: 12/12/2001
 
 ******************************************************************************}
 
@@ -47,21 +47,20 @@ type
     {grava no banco de dados os registros do objeto}
     procedure Post; dynamic; abstract;
     {atualiza o registro corrente com o do BD}
-    procedure Read(Explorer: Boolean = False); dynamic; abstract;
+    procedure Read; dynamic; abstract;
     {movimentação do cursor nos registros do objeto}
     procedure First; dynamic; abstract;
     procedure Last; dynamic; abstract;
     procedure Prior; dynamic; abstract;
     procedure Next; dynamic; abstract;
     {vai direto para um registro na posição especificada}
-    procedure GotoReg(RecIndex: Integer;
-                      Explorer: Boolean = False); dynamic; abstract;
+    procedure GotoReg(RecIndex: Integer); dynamic; abstract;
     {retorna a posição do cursor Begin Of File (primeiro registro) ou
      End Of File (último registro) no objeto}
     function Bof: Boolean; dynamic; abstract;
     function Eof: Boolean; dynamic; abstract;
     {retorna a quantidade de registros do objeto}
-    function RecCount(Explorer: Boolean = False): Integer; dynamic; abstract;
+    function RecCount: Integer; dynamic; abstract;
   public
     { Public declarations }
     {retorna o estado do objeto (ver constantes na unit_Comum)}
@@ -113,6 +112,12 @@ type
     ADOCommand_Exemplares: TADOCommand;
     ADODataSet_Explorer: TADODataSet;
     ADOCommand_Explorer: TADOCommand;
+    ADOCommand_ClasseAcervos: TADOCommand;
+    ADODataSet_ClasseAcervos: TADODataSet;
+    ADODataSet_MovData: TADODataSet;
+    ADOCommand_MovData: TADOCommand;
+    ADOCommand_Aux: TADOCommand;
+    ADODataSet_Aux: TADODataSet;
     procedure DataModuleCreate(Sender: TObject);
   private
     { Private declarations }
@@ -353,20 +358,20 @@ type
     {grava no banco de dados os registros do objeto}
     procedure Post; override;
     {atualiza o registro corrente com o do BD}
-    procedure Read(Explorer: Boolean = False); override;
+    procedure Read; override;
     {movimentação do cursor nos registros do objeto}
     procedure First; override;
     procedure Last; override;
     procedure Prior; override;
     procedure Next; override;
     {vai direto para um registro na posição especificada}
-    procedure GotoReg(RecIndex: Integer; Explorer: Boolean = False); override;
+    procedure GotoReg(RecIndex: Integer); override;
     {retorna a posição do cursor Begin Of File (primeiro registro) ou
      End Of File (último registro) no objeto}
     function Bof: Boolean; override;
     function Eof: Boolean; override;
     {retorna a quantidade de registros do objeto}
-    function RecCount(Explorer: Boolean = False): Integer; override;
+    function RecCount: Integer; override;
     procedure Search(var ADODataSet: TADODataSet; FilterStr: String);
     procedure LocateId(Id: Integer);
     function Exists(RGA: String): Boolean;
@@ -400,20 +405,20 @@ type
     {grava no banco de dados os registros do objeto}
     procedure Post; override;
     {atualiza o registro corrente com o do BD}
-    procedure Read(Explorer: Boolean = False); override;
+    procedure Read; override;
     {movimentação do cursor nos registros do objeto}
     procedure First; override;
     procedure Last; override;
     procedure Prior; override;
     procedure Next; override;
     {vai direto para um registro na posição especificada}
-    procedure GotoReg(RecIndex: Integer; Explorer: Boolean = False); override;
+    procedure GotoReg(RecIndex: Integer); override;
     {retorna a posição do cursor Begin Of File (primeiro registro) ou
      End Of File (último registro) no objeto}
     function Bof: Boolean; override;
     function Eof: Boolean; override;
     {retorna a quantidade de registros do objeto}
-    function RecCount(Explorer: Boolean = False): Integer; override;
+    function RecCount: Integer; override;
     procedure Search(var ADODataSet: TADODataSet; FilterStr: String);
     procedure LocateId(Id: Integer);
     procedure LocateNome(Nm: String);
@@ -429,12 +434,6 @@ type
   end;
 type
   TExemplares = Array of TExemplar;
-type
-  TClasse = Array of String;
-type
-  TClasses = record
-    TipoAcervo, AreaAcervo, ClassificacaoAcervo: TClasse;
-  end;
 type
   TAcervos = class(TDataClass)
   private
@@ -452,6 +451,7 @@ type
     { Protected declarations }
   public
     { Public declarations }
+    MaxTombo: Integer;
     {redeclaração das propriedades e reimplementação dos métodos do TDataClass}
     constructor Create; override;
     property RecNo: Integer read GetRecNo;
@@ -462,26 +462,77 @@ type
     {grava no banco de dados os registros do objeto}
     procedure Post; override;
     {atualiza o registro corrente com o do BD}
-    procedure Read(Explorer: Boolean = False); override;
+    procedure Read; override;
     {movimentação do cursor nos registros do objeto}
     procedure First; override;
     procedure Last; override;
     procedure Prior; override;
     procedure Next; override;
     {vai direto para um registro na posição especificada}
-    procedure GotoReg(RecIndex: Integer; Explorer: Boolean = False); override;
+    procedure GotoReg(RecIndex: Integer); override;
     {retorna a posição do cursor Begin Of File (primeiro registro) ou
      End Of File (último registro) no objeto}
     function Bof: Boolean; override;
     function Eof: Boolean; override;
     {retorna a quantidade de registros do objeto}
-    function RecCount(Explorer: Boolean = False): Integer; override;
+    function RecCount: Integer; override;
     {pesquisa e localização}
     procedure Search(var ADODataSet: TADODataSet; FilterStr: String);
     procedure LocateTombo(Tmb: Integer);
     function Exists(Tmb: Integer): Boolean;
     procedure GetExemplares(var Exemplares: TExemplares);
-    procedure GetClasses(var Classes: TClasses);
+    procedure GetTitulos(Tipo,Area,Classificacao: String);
+  end;
+
+{TAcervosEx}
+{contém os dados relativos ao Cadastro de Acervos, para o Explorer}
+type
+  TAcervosEx = class(TDataClass)
+  private
+    { Private declarations }
+    {rotinas de gravação no BD}
+    FDataRecord: TAcervo;
+    procedure PostInsert;
+    procedure PostDelete;
+    procedure PostEdit;
+    {rotinas para atribuir propriedades}
+    procedure SetRegistro(Value: TAcervo);
+    function GetRegistro: TAcervo;
+    function GetRecNo: Integer;
+  protected
+    { Protected declarations }
+  public
+    { Public declarations }
+    MaxTombo: Integer;
+    {redeclaração das propriedades e reimplementação dos métodos do TDataClass}
+    constructor Create; override;
+    property RecNo: Integer read GetRecNo;
+    property Registro: TAcervo read GetRegistro write SetRegistro;
+    procedure Refresh; override;
+    procedure Insert; override;
+    procedure Delete; override;
+    {grava no banco de dados os registros do objeto}
+    procedure Post; override;
+    {atualiza o registro corrente com o do BD}
+    procedure Read; override;
+    {movimentação do cursor nos registros do objeto}
+    procedure First; override;
+    procedure Last; override;
+    procedure Prior; override;
+    procedure Next; override;
+    {vai direto para um registro na posição especificada}
+    procedure GotoReg(RecIndex: Integer); override;
+    {retorna a posição do cursor Begin Of File (primeiro registro) ou
+     End Of File (último registro) no objeto}
+    function Bof: Boolean; override;
+    function Eof: Boolean; override;
+    {retorna a quantidade de registros do objeto}
+    function RecCount: Integer; override;
+    {pesquisa e localização}
+    procedure Search(var ADODataSet: TADODataSet; FilterStr: String);
+    procedure LocateTombo(Tmb: Integer);
+    function Exists(Tmb: Integer): Boolean;
+    procedure GetExemplares(var Exemplares: TExemplares);
     procedure GetTitulos(Tipo,Area,Classificacao: String);
   end;
 
@@ -513,20 +564,20 @@ type
     {grava no banco de dados os registros do objeto}
     procedure Post; override;
     {atualiza o registro corrente com o do BD}
-    procedure Read(Explorer: Boolean = False); override;
+    procedure Read; override;
     {movimentação do cursor nos registros do objeto}
     procedure First; override;
     procedure Last; override;
     procedure Prior; override;
     procedure Next; override;
     {vai direto para um registro na posição especificada}
-    procedure GotoReg(RecIndex: Integer; Explorer: Boolean = False); override;
+    procedure GotoReg(RecIndex: Integer); override;
     {retorna a posição do cursor Begin Of File (primeiro registro) ou
      End Of File (último registro) no objeto}
     function Bof: Boolean; override;
     function Eof: Boolean; override;
     {retorna a quantidade de registros do objeto}
-    function RecCount(Explorer: Boolean = False): Integer; override;
+    function RecCount: Integer; override;
     procedure LocateDescricao(Descricao: String);
     function Exists(Descricao: String): Boolean;
   end;
@@ -559,20 +610,20 @@ type
     {grava no banco de dados os registros do objeto}
     procedure Post; override;
     {atualiza o registro corrente com o do BD}
-    procedure Read(Explorer: Boolean = False); override;
+    procedure Read; override;
     {movimentação do cursor nos registros do objeto}
     procedure First; override;
     procedure Last; override;
     procedure Prior; override;
     procedure Next; override;
     {vai direto para um registro na posição especificada}
-    procedure GotoReg(RecIndex: Integer; Explorer: Boolean = False); override;
+    procedure GotoReg(RecIndex: Integer); override;
     {retorna a posição do cursor Begin Of File (primeiro registro) ou
      End Of File (último registro) no objeto}
     function Bof: Boolean; override;
     function Eof: Boolean; override;
     {retorna a quantidade de registros do objeto}
-    function RecCount(Explorer: Boolean = False): Integer; override;
+    function RecCount: Integer; override;
     procedure LocateDescricao(Descricao: String);
     function Exists(Descricao: String): Boolean;
   end;
@@ -605,20 +656,20 @@ type
     {grava no banco de dados os registros do objeto}
     procedure Post; override;
     {atualiza o registro corrente com o do BD}
-    procedure Read(Explorer: Boolean = False); override;
+    procedure Read; override;
     {movimentação do cursor nos registros do objeto}
     procedure First; override;
     procedure Last; override;
     procedure Prior; override;
     procedure Next; override;
     {vai direto para um registro na posição especificada}
-    procedure GotoReg(RecIndex: Integer; Explorer: Boolean = False); override;
+    procedure GotoReg(RecIndex: Integer); override;
     {retorna a posição do cursor Begin Of File (primeiro registro) ou
      End Of File (último registro) no objeto}
     function Bof: Boolean; override;
     function Eof: Boolean; override;
     {retorna a quantidade de registros do objeto}
-    function RecCount(Explorer: Boolean = False): Integer; override;
+    function RecCount: Integer; override;
     procedure LocateDescricao(Descricao: String);
     function Exists(Descricao: String): Boolean;
   end;
@@ -651,20 +702,20 @@ type
     {grava no banco de dados os registros do objeto}
     procedure Post; override;
     {atualiza o registro corrente com o do BD}
-    procedure Read(Explorer: Boolean = False); override;
+    procedure Read; override;
     {movimentação do cursor nos registros do objeto}
     procedure First; override;
     procedure Last; override;
     procedure Prior; override;
     procedure Next; override;
     {vai direto para um registro na posição especificada}
-    procedure GotoReg(RecIndex: Integer; Explorer: Boolean = False); override;
+    procedure GotoReg(RecIndex: Integer); override;
     {retorna a posição do cursor Begin Of File (primeiro registro) ou
      End Of File (último registro) no objeto}
     function Bof: Boolean; override;
     function Eof: Boolean; override;
     {retorna a quantidade de registros do objeto}
-    function RecCount(Explorer: Boolean = False): Integer; override;
+    function RecCount: Integer; override;
     procedure LocateDescricao(Descricao: String);
     function Exists(Descricao: String): Boolean;
   end;
@@ -697,20 +748,20 @@ type
     {grava no banco de dados os registros do objeto}
     procedure Post; override;
     {atualiza o registro corrente com o do BD}
-    procedure Read(Explorer: Boolean = False); override;
+    procedure Read; override;
     {movimentação do cursor nos registros do objeto}
     procedure First; override;
     procedure Last; override;
     procedure Prior; override;
     procedure Next; override;
     {vai direto para um registro na posição especificada}
-    procedure GotoReg(RecIndex: Integer; Explorer: Boolean = False); override;
+    procedure GotoReg(RecIndex: Integer); override;
     {retorna a posição do cursor Begin Of File (primeiro registro) ou
      End Of File (último registro) no objeto}
     function Bof: Boolean; override;
     function Eof: Boolean; override;
     {retorna a quantidade de registros do objeto}
-    function RecCount(Explorer: Boolean = False): Integer; override;
+    function RecCount: Integer; override;
     procedure LocateDescricao(Descricao: String);
     function Exists(Descricao: String): Boolean;
   end;
@@ -743,20 +794,20 @@ type
     {grava no banco de dados os registros do objeto}
     procedure Post; override;
     {atualiza o registro corrente com o do BD}
-    procedure Read(Explorer: Boolean = False); override;
+    procedure Read; override;
     {movimentação do cursor nos registros do objeto}
     procedure First; override;
     procedure Last; override;
     procedure Prior; override;
     procedure Next; override;
     {vai direto para um registro na posição especificada}
-    procedure GotoReg(RecIndex: Integer; Explorer: Boolean = False); override;
+    procedure GotoReg(RecIndex: Integer); override;
     {retorna a posição do cursor Begin Of File (primeiro registro) ou
      End Of File (último registro) no objeto}
     function Bof: Boolean; override;
     function Eof: Boolean; override;
     {retorna a quantidade de registros do objeto}
-    function RecCount(Explorer: Boolean = False): Integer; override;
+    function RecCount: Integer; override;
     procedure LocateDescricao(Descricao: String);
     function Exists(Descricao: String): Boolean;
   end;
@@ -789,22 +840,110 @@ type
     {grava no banco de dados os registros do objeto}
     procedure Post; override;
     {atualiza o registro corrente com o do BD}
-    procedure Read(Explorer: Boolean = False); override;
+    procedure Read; override;
     {movimentação do cursor nos registros do objeto}
     procedure First; override;
     procedure Last; override;
     procedure Prior; override;
     procedure Next; override;
     {vai direto para um registro na posição especificada}
-    procedure GotoReg(RecIndex: Integer; Explorer: Boolean = False); override;
+    procedure GotoReg(RecIndex: Integer); override;
     {retorna a posição do cursor Begin Of File (primeiro registro) ou
      End Of File (último registro) no objeto}
     function Bof: Boolean; override;
     function Eof: Boolean; override;
     {retorna a quantidade de registros do objeto}
-    function RecCount(Explorer: Boolean = False): Integer; override;
+    function RecCount: Integer; override;
     procedure LocateUserName(UserName: String);
     function Exists(UserName: String): Boolean;
+  end;
+
+{TClasseAcervo}
+type
+  TAcervoArray = Array of TAcervo;
+type
+  TClasseAcervo = class(TDataRecord)
+  public
+    { Public declarations }
+    Tipo: String20;
+    Area: String20;
+    Classificacao: String20;
+    Acervos: TAcervoArray;
+    constructor Create;
+    destructor Destroy; override;
+    procedure Assign(Source: TClasseAcervo);
+  end;
+
+{TClasseAcervos}
+type
+  TClasseAcervos = class(TDataClass)
+  private
+    { Private declarations }
+    {rotinas de gravação no BD}
+    FDataRecord: TClasseAcervo;
+    FAcervos: TAcervosEx;
+    {rotinas para atribuir propriedades}
+    function GetRegistro: TClasseAcervo;
+    function GetRecNo: Integer;
+  protected
+    { Protected declarations }
+  public
+    { Public declarations }
+    {redeclaração das propriedades e reimplementação dos métodos do TDataClass}
+    constructor Create; override;
+    destructor Destroy; override;
+    property RecNo: Integer read GetRecNo;
+    property Registro: TClasseAcervo read GetRegistro;
+    procedure Refresh; override;
+    {atualiza o registro corrente com o do BD}
+    procedure Read; override;
+    {movimentação do cursor nos registros do objeto}
+    procedure First; override;
+    procedure Last; override;
+    procedure Prior; override;
+    procedure Next; override;
+    {vai direto para um registro na posição especificada}
+    procedure GotoReg(RecIndex: Integer); override;
+    {retorna a posição do cursor Begin Of File (primeiro registro) ou
+     End Of File (último registro) no objeto}
+    function Bof: Boolean; override;
+    function Eof: Boolean; override;
+    {retorna a quantidade de registros do objeto}
+    function RecCount: Integer; override;
+    procedure LocateTombo(Tombo: Integer);
+  end;
+
+{TMovData}
+type
+  TMovData = class(TDataClass)
+  private
+    { Private declarations }
+  protected
+    { Protected declarations }
+  public
+    { Public declarations }
+    UltimoErro: String;
+    {retorna o nome de usuário dado um RGA}
+    function RGAToUsuario(RGA: String): String;
+    {retorna o RGA dado o nome de usuário}
+    function UsuarioToRGA(Usuario: String): String;
+    {retorna qtos exemplares estão emprestados p/ usu}
+    function QtdEmpUsuario(Usuario: String): Integer;
+    {lista as reservas}
+    procedure ListaReserva(var Lista: TStringList; Tombo: Integer);
+    {empresta exemplar}
+    function Emprestar(Tombo: Integer; Usuario: String): Boolean;
+    {devolve exemplar}
+    function Devolver(Tombo: Integer): Boolean;
+    {reserva exemplar}
+    function Reservar(Tombo: Integer; Usuario: String): Boolean;
+    {exemplar perdido}
+    function MoverPerdido(Tombo: Integer; Usuario: String;
+                          Coloca: Boolean = True): Boolean;
+    function GetDataPrevDev(Tombo: Integer): String;
+    procedure GetUsuarioAPerdido(Tombo: Integer;
+                                var Usuario: String; var RGA: String);
+    procedure LiberaUsuario;
   end;
 
 {**************** Variáveis Globais *********************}
@@ -1303,7 +1442,7 @@ begin
   DataModule_Biblio.ADODataSet_Usuarios.Close;
 end;
 
-procedure TUsuarios.GotoReg(RecIndex: Integer; Explorer: Boolean = False);
+procedure TUsuarios.GotoReg(RecIndex: Integer);
 begin
   {reabre dataset, se necessário}
   Self.Refresh;
@@ -1385,7 +1524,7 @@ begin
     Result := (RecNo = RecordCount);
 end;
 
-function TUsuarios.RecCount(Explorer: Boolean = False): Integer;
+function TUsuarios.RecCount: Integer;
 begin
   {retorna a quantidade de registros}
   with DataModule_Biblio.ADODataSet_Usuarios do
@@ -1449,7 +1588,7 @@ begin
   Screen.Cursor := crDefault;
 end;
 
-procedure TUsuarios.Read(Explorer: Boolean = False);
+procedure TUsuarios.Read;
 var i: Integer;
 begin
   {lê registro atual}
@@ -1773,7 +1912,7 @@ begin
   DataModule_Biblio.ADODataSet_Fornecedores.Close;
 end;
 
-procedure TFornecedores.GotoReg(RecIndex: Integer; Explorer: Boolean = False);
+procedure TFornecedores.GotoReg(RecIndex: Integer);
 begin
   {reabre dataset, se necessário}
   Self.Refresh;
@@ -1855,7 +1994,7 @@ begin
     Result := (RecNo = RecordCount);
 end;
 
-function TFornecedores.RecCount(Explorer: Boolean = False): Integer;
+function TFornecedores.RecCount: Integer;
 begin
   {retorna a quantidade de registros}
   with DataModule_Biblio.ADODataSet_Fornecedores do
@@ -2224,22 +2363,16 @@ begin
   DataModule_Biblio.ADODataSet_Acervos.Close;
 end;
 
-procedure TAcervos.GotoReg(RecIndex: Integer; Explorer: Boolean = False);
-var Ds: TADODataSet;
+procedure TAcervos.GotoReg(RecIndex: Integer);
 begin
   {reabre dataset, se necessário}
-  if not Explorer then
-    Self.Refresh;
+  Self.Refresh;
   {move cursor para o indice dado}
-  if Explorer then
-    Ds := DataModule_Biblio.ADODataSet_Explorer
-  else
-    Ds := DataModule_Biblio.ADODataSet_Acervos;
-  with Ds do
+  with DataModule_Biblio.ADODataSet_Acervos do
     if (RecIndex > 0) and (RecIndex <= RecordCount) then
       RecNo := RecIndex;
   {lê o registro}
-  Self.Read(Explorer);
+  Self.Read;
 end;
 
 procedure TAcervos.First;
@@ -2312,15 +2445,10 @@ begin
     Result := (RecNo = RecordCount);
 end;
 
-function TAcervos.RecCount(Explorer: Boolean = False): Integer;
-var Ds: TADODataSet;
+function TAcervos.RecCount: Integer;
 begin
   {retorna a quantidade de registros}
-  if Explorer then
-    Ds := DataModule_Biblio.ADODataSet_Explorer
-  else
-    Ds := DataModule_Biblio.ADODataSet_Acervos;
-  with Ds do
+  with DataModule_Biblio.ADODataSet_Acervos do
     Result := RecordCount;
 end;
 
@@ -2414,17 +2542,32 @@ begin
   Screen.Cursor := crDefault;
 end;
 
-procedure TAcervos.Read(Explorer: Boolean = False);
-var Ds: TADODataSet;
+procedure TAcervos.Read;
 begin
-  {lê registro atual}
-  if Explorer then
-    Ds := DataModule_Biblio.ADODataSet_Explorer
-  else
-    Ds := DataModule_Biblio.ADODataSet_Acervos;
-  with Ds, FDataRecord do
+  with DataModule_Biblio.ADODataSet_Aux,
+       DataModule_Biblio.ADOCommand_Aux do
   begin
-    if (not Active) or (Ds.RecordCount = 0) then
+    Close;
+    CommandText := 'SELECT MAX(TOMBO) AS MAXTOMBO FROM ACERVO';
+    try
+      RecordSet := Execute;
+      Open;
+      MaxTombo := FieldByName('MAXTOMBO').AsInteger;
+      Close;
+    except
+      on E: Exception do
+      begin
+        with Application do
+          MessageBox(PChar(MSG_ERROSELECT + E.Message),
+                     CAP_ERRODB,MB_OKICONSTOP);
+      end;
+    end;
+  end;
+  {lê registro atual}
+  with DataModule_Biblio.ADODataSet_Acervos, FDataRecord do
+  begin
+    if (not Active) or
+       (DataModule_Biblio.ADODataSet_Acervos.RecordCount = 0) then
       exit;
     Titulo := FieldByName('Titulo').AsString;
     Autor := FieldByName('Autor').AsString;
@@ -2547,7 +2690,7 @@ begin
       'UPDATE ' +
       '  ACERVO ' +
       'SET ' +
-      '  TOMBO = ' + IntToStr(Tombo) + ',' +
+//      '  TOMBO = ' + IntToStr(Tombo) + ',' +
       '  TITULO = ' + #39 + Titulo + #39 + ',' +
       '  AUTOR = ' + #39 + Autor + #39 + ',' +
       '  EDITORA = ' + #39 + Editora + #39 + ',' +
@@ -2856,15 +2999,542 @@ begin
   end;
 end;
 
-procedure TAcervos.GetClasses(var Classes: TClasses);
+procedure TAcervos.GetTitulos(Tipo,Area,Classificacao: String);
+begin
+  {lê o banco de dados e atribui valores a classe de Dados}
+  with DataModule_Biblio.ADODataSet_Acervos,
+       DataModule_Biblio.ADOCommand_Acervos do
+  begin
+    FState := stDBWait;
+    Close;
+    Screen.Cursor := crSQLWait;
+    CommandText :=
+      'SELECT DISTINCT ' +
+      '  A.TITULO,' +
+      '  A.AUTOR,' +
+      '  A.EDITORA,' +
+      '  A.COLECAO,' +
+      '  A.VOLUME,' +
+      '  A.EDICAO,' +
+      '  A.ANO,' +
+      '  A.PAGINAS,' +
+      '  A.ASSUNTO,' +
+      '  A.FAIXAETARIA,' +
+      '  A.LOCALIZACAO,' +
+      '  A.IDFORNEC,' +
+      '  A.IDAREA,' +
+      '  A.IDTIPOACERVO,' +
+      '  A.IDCLASSIFICACAO,' +
+      '  A.DATACADASTRO,' +
+      '  T.DESCRICAO AS TIPO, T.PODEEMPRESTAR, TA.DESCRICAO AS AREA, ' +
+      '  TC.DESCRICAO AS CLASSIFICACAO, F.NOME AS FORNECEDOR  ' +
+      'FROM ' +
+      '  ACERVO A, TIPOACERVO T, TIPOAREA TA, TIPOCLASSIFICACAO TC, ' +
+      '  FORNECEDOR F ' +
+      'WHERE ' +
+      '  A.IDTIPOACERVO = T.IDTIPOACERVO AND ' +
+      '  A.IDAREA = TA.IDAREA AND ' +
+      '  A.IDCLASSIFICACAO = TC.IDCLASSIFICACAO AND ' +
+      '  A.IDFORNEC = F.IDFORNEC AND ' +
+      '  T.DESCRICAO = ' + #39 + Tipo + #39 + ' AND ' +
+      '  TA.DESCRICAO = ' + #39 + Area + #39 + ' AND ' +
+      '  TC.DESCRICAO = ' + #39 + Classificacao + #39 + ' ' +
+      'ORDER BY A.TITULO';
+    try
+      RecordSet := Execute;
+    except
+      on E: Exception do
+      begin
+        with Application do
+          MessageBox(PChar(MSG_ERROSELECT + E.Message),
+                     CAP_ERRODB,MB_OKICONSTOP);
+        Self.RollBackTrans;
+        FState := stRead;
+        Screen.Cursor := crDefault;
+        exit;
+      end;
+    end;
+    Open;
+    First;
+  end;
+  Self.Read;
+  FState := stRead;
+  Screen.Cursor := crDefault;
+end;
+
+{-------------------- TAcervosEx -----------------------}
+
+constructor TAcervosEx.Create;
+begin
+  inherited Create;
+  {inicializa valores}
+  FDataRecord := TAcervo.Create;
+  DataModule_Biblio.ADODataSet_Explorer.Close;
+end;
+
+procedure TAcervosEx.GotoReg(RecIndex: Integer);
+begin
+  {move cursor para o indice dado}
+  with DataModule_Biblio.ADODataSet_Explorer do
+    if (RecIndex > 0) and (RecIndex <= RecordCount) then
+      RecNo := RecIndex;
+  {lê o registro}
+  Self.Read;
+end;
+
+procedure TAcervosEx.First;
+begin
+  {move cursor}
+  with DataModule_Biblio.ADODataSet_Explorer do
+    First;
+  {lê o registro}
+  Self.Read;
+end;
+
+procedure TAcervosEx.Last;
+begin
+  {move cursor}
+  with DataModule_Biblio.ADODataSet_Explorer do
+    Last;
+  {lê o registro}
+  Self.Read;
+end;
+
+procedure TAcervosEx.Prior;
+begin
+  {move cursor}
+  with DataModule_Biblio.ADODataSet_Explorer do
+    Prior;
+  {lê o registro}
+  Self.Read;
+end;
+
+procedure TAcervosEx.Next;
+begin
+  {move cursor}
+  with DataModule_Biblio.ADODataSet_Explorer do
+    Next;
+  {lê o registro}
+  Self.Read;
+end;
+
+procedure TAcervosEx.SetRegistro(Value: TAcervo);
+begin
+  {permite acesso ao registro}
+  FDataRecord := Value;
+end;
+
+function TAcervosEx.GetRegistro: TAcervo;
+begin
+  {permite acesso ao registro}
+  Result := FDataRecord;
+end;
+
+function TAcervosEx.Bof: Boolean;
+begin
+  {retorna True se for o primeiro registro}
+  with DataModule_Biblio.ADODataSet_Explorer do
+    Result := (RecNo = 1);
+end;
+
+function TAcervosEx.Eof: Boolean;
+begin
+  {retorna True se for o último registro}
+  with DataModule_Biblio.ADODataSet_Explorer do
+    Result := (RecNo = RecordCount);
+end;
+
+function TAcervosEx.RecCount: Integer;
+begin
+  {retorna a quantidade de registros}
+  with DataModule_Biblio.ADODataSet_Explorer do
+    Result := RecordCount;
+end;
+
+function TAcervosEx.GetRecNo: Integer;
+begin
+  {retorna numero do reg atual}
+  with DataModule_Biblio.ADODataSet_Explorer do
+    Result := RecNo;
+end;
+
+procedure TAcervosEx.Insert;
+begin
+  {coloca em modo stInsert}
+  if FState = stRead then
+  begin
+    FDataRecord := TAcervo.Create;
+    FState := stInsert;
+  end;
+end;
+
+procedure TAcervosEx.Delete;
+begin
+  if FState = stRead then
+  begin
+    {coloca em modo de "Delete"}
+    FState := stDelete;
+    {grava as alterações no BD}
+    Post;
+  end;
+end;
+
+procedure TAcervosEx.Refresh;
+begin
+  {lê o banco de dados e atribui valores a classe de Dados}
+  with DataModule_Biblio.ADODataSet_Explorer,
+       DataModule_Biblio.ADOCommand_Explorer do
+  begin
+    if DataModule_Biblio.ADODataSet_Explorer.Active then
+      Close;
+    FState := stDBWait;
+    Screen.Cursor := crSQLWait;
+    CommandText :=
+      'SELECT DISTINCT ' +
+      '  A.TITULO,' +
+      '  A.AUTOR,' +
+      '  A.EDITORA,' +
+      '  A.COLECAO,' +
+      '  A.VOLUME,' +
+      '  A.EDICAO,' +
+      '  A.ANO,' +
+      '  A.PAGINAS,' +
+      '  A.ASSUNTO,' +
+      '  A.FAIXAETARIA,' +
+      '  A.LOCALIZACAO,' +
+      '  A.IDFORNEC,' +
+      '  A.IDAREA,' +
+      '  A.IDTIPOACERVO,' +
+      '  A.IDCLASSIFICACAO,' +
+      '  A.DATACADASTRO,' +
+      '  T.DESCRICAO AS TIPO, T.PODEEMPRESTAR, TA.DESCRICAO AS AREA, ' +
+      '  TC.DESCRICAO AS CLASSIFICACAO, F.NOME AS FORNECEDOR  ' +
+      'FROM ' +
+      '  ACERVO A, TIPOACERVO T, TIPOAREA TA, TIPOCLASSIFICACAO TC, ' +
+      '  FORNECEDOR F ' +
+      'WHERE ' +
+      '  A.IDTIPOACERVO = T.IDTIPOACERVO AND ' +
+      '  A.IDAREA = TA.IDAREA AND ' +
+      '  A.IDCLASSIFICACAO = TC.IDCLASSIFICACAO AND ' +
+      '  A.IDFORNEC = F.IDFORNEC ' +
+      'ORDER BY A.TITULO';
+    try
+      RecordSet := Execute;
+    except
+      on E: Exception do
+      begin
+        with Application do
+          MessageBox(PChar(MSG_ERROSELECT + E.Message),
+                     CAP_ERRODB,MB_OKICONSTOP);
+        Self.RollBackTrans;
+        FState := stRead;
+        Screen.Cursor := crDefault;
+        exit;
+      end;
+    end;
+    Open;
+    First;
+  end;
+  Self.Read;
+  FState := stRead;
+  Screen.Cursor := crDefault;
+end;
+
+procedure TAcervosEx.Read;
+begin
+  with DataModule_Biblio.ADODataSet_Aux,
+       DataModule_Biblio.ADOCommand_Aux do
+  begin
+    Close;
+    CommandText := 'SELECT MAX(TOMBO) AS MAXTOMBO FROM ACERVO';
+    try
+      RecordSet := Execute;
+      Open;
+      MaxTombo := FieldByName('MAXTOMBO').AsInteger;
+      Close;
+    except
+      on E: Exception do
+      begin
+        with Application do
+          MessageBox(PChar(MSG_ERROSELECT + E.Message),
+                     CAP_ERRODB,MB_OKICONSTOP);
+      end;
+    end;
+  end;
+  {lê registro atual}
+  with DataModule_Biblio.ADODataSet_Explorer, FDataRecord do
+  begin
+    if (not Active) or
+       (DataModule_Biblio.ADODataSet_Explorer.RecordCount = 0) then
+      exit;
+    Titulo := FieldByName('Titulo').AsString;
+    Autor := FieldByName('Autor').AsString;
+    Editora := FieldByName('Editora').AsString;
+    Colecao := FieldByName('Colecao').AsString;
+    Volume := FieldByName('Volume').AsInteger;
+    Edicao := FieldByName('Edicao').AsInteger;
+    Ano := FieldByName('Ano').AsInteger;
+    Paginas := FieldByName('Paginas').AsInteger;
+    Assunto := FieldByName('Assunto').AsString;
+    FaixaEtaria := FieldByName('FaixaEtaria').AsString;
+    Localizacao := FieldByName('Localizacao').AsString;
+    DataCadastro := FieldByName('DataCadastro').AsDateTime;
+    with TipoAcervo do
+    begin
+      IdTipoAcervo := FieldByName('IdTipoAcervo').AsInteger;
+      Descricao := FieldByName('Tipo').AsString;
+      PodeEmprestar := FieldByName('PodeEmprestar').AsBoolean;
+    end;
+    with AreaAcervo do
+    begin
+      IdArea := FieldByName('IdArea').AsInteger;
+      Descricao := FieldByName('Area').AsString;
+    end;
+    with ClassificacaoAcervo do
+    begin
+      IdClassificacao := FieldByName('IdClassificacao').AsInteger;
+      Descricao := FieldByName('Classificacao').AsString;
+    end;
+    with Fornecedor do
+    begin
+      IdFornec := FieldByName('IdFornec').AsInteger;
+      Nome := FieldByName('Fornecedor').AsString;
+    end;
+  end;
+end;
+
+procedure TAcervosEx.PostInsert;
+begin
+  FState := stDBWait;
+  DataModule_Biblio.ADODataSet_Explorer.Close;
+  with DataModule_Biblio.ADODataSet_Explorer,
+       DataModule_Biblio.ADOCommand_Explorer,
+       FDataRecord, FDataRecord.TipoAcervo, FDataRecord.Fornecedor,
+       FDataRecord.AreaAcervo, FDataRecord.ClassificacaoAcervo do
+  begin
+    {Insere o registro na Tabela}
+    ShortDateFormat := 'yyyy/mm/dd';
+    CommandText :=
+      'INSERT INTO ' +
+      '  ACERVO ' +
+      '    (TOMBO,' +
+      '     TITULO,' +
+      '     AUTOR,' +
+      '     EDITORA,' +
+      '     COLECAO,' +
+      '     VOLUME,' +
+      '     EDICAO,' +
+      '     ANO,' +
+      '     PAGINAS,' +
+      '     ASSUNTO,' +
+      '     FAIXAETARIA,' +
+      '     LOCALIZACAO,' +
+      '     SITUACAO,' +
+      '     DATACADASTRO,' +
+      '     IDTIPOACERVO,' +
+      '     IDAREA,' +
+      '     IDCLASSIFICACAO,' +
+      '     IDFORNEC) ' +
+      'VALUES ' +
+      '  (' + IntToStr(Tombo) + ',' +
+      '   ' + #39 + Titulo + #39 + ',' +
+      '   ' + #39 + Autor + #39 + ',' +
+      '   ' + #39 + Editora + #39 + ',' +
+      '   ' + #39 + Colecao + #39 + ',' +
+      '   ' + IntToStr(Volume) + ',' +
+      '   ' + IntToStr(Edicao) + ',' +
+      '   ' + IntToStr(Ano) + ',' +
+      '   ' + IntToStr(Paginas) + ',' +
+      '   ' + #39 + Assunto + #39 + ',' +
+      '   ' + #39 + FaixaEtaria + #39 + ',' +
+      '   ' + #39 + Localizacao + #39 + ',' +
+      '   ' + #39 + Situacao + #39 + ',' +
+      '   ' + #39 + DateToStr(DataCadastro) + #39 + ',' +
+      '   ' + IntToStr(IdTipoAcervo) + ',' +
+      '   ' + IntToStr(IdArea) + ',' +
+      '   ' + IntToStr(IdClassificacao) + ',' +
+      '   ' + IntToStr(IdFornec) + ')';
+    ShortDateFormat := 'dd/mm/yyyy';
+    try
+      Execute;
+    except
+      on E: Exception do
+      begin
+        with Application do
+          MessageBox(PChar(MSG_ERROINSERT + E.Message),
+                     CAP_ERRODB,MB_OKICONSTOP);
+        Self.RollBackTrans;
+        FState := stRead;
+        Screen.Cursor := crDefault;
+        exit;
+      end;
+    end;
+    Close;
+  end;
+end;
+
+procedure TAcervosEx.PostEdit;
+begin
+  FState := stDBWait;
+  DataModule_Biblio.ADODataSet_Explorer.Close;
+  with DataModule_Biblio.ADODataSet_Explorer,
+       DataModule_Biblio.ADOCommand_Explorer,
+       FDataRecord, FDataRecord.TipoAcervo, FDataRecord.Fornecedor,
+       FDataRecord.AreaAcervo, FDataRecord.ClassificacaoAcervo do
+  begin
+    {Faz Update do registro na Tabela}
+    ShortDateFormat := 'yyyy/mm/dd';
+    CommandText :=
+      'UPDATE ' +
+      '  ACERVO ' +
+      'SET ' +
+      '  TOMBO = ' + IntToStr(Tombo) + ',' +
+      '  TITULO = ' + #39 + Titulo + #39 + ',' +
+      '  AUTOR = ' + #39 + Autor + #39 + ',' +
+      '  EDITORA = ' + #39 + Editora + #39 + ',' +
+      '  COLECAO = ' + #39 + Colecao + #39 + ',' +
+      '  VOLUME = ' + IntToStr(Volume) + ',' +
+      '  EDICAO = ' + IntToStr(Edicao) + ',' +
+      '  ANO = ' + IntToStr(Ano) + ',' +
+      '  PAGINAS = ' + IntToStr(Paginas) + ',' +
+      '  ASSUNTO = ' + #39 + Assunto + #39 + ',' +
+      '  FAIXAETARIA = ' + #39 + FaixaEtaria + #39 + ',' +
+      '  LOCALIZACAO = ' + #39 + Localizacao + #39 + ',' +
+      '  SITUACAO = ' + #39 + Situacao + #39 + ',' +
+      '  DATACADASTRO = ' + #39 + DateToStr(DataCadastro) + #39 + ',' +
+      '  IDTIPOACERVO = ' + IntToStr(IdTipoAcervo) + ',' +
+      '  IDAREA = ' + IntToStr(IdArea) + ',' +
+      '  IDCLASSIFICACAO = ' + IntToStr(IdClassificacao) + ',' +
+      '  IDFORNEC = ' + IntToStr(IdFornec) + ' ' +
+      'WHERE ' +
+      '  TOMBO = ' + IntToStr(Tombo);
+    ShortDateFormat := 'dd/mm/yyyy';
+    try
+      Execute;
+    except
+      on E: Exception do
+      begin
+        with Application do
+          MessageBox(PChar(MSG_ERROUPDATE + E.Message),
+                     CAP_ERRODB,MB_OKICONSTOP);
+        Self.RollBackTrans;
+        FState := stRead;
+        Screen.Cursor := crDefault;
+        Self.Refresh;
+        Self.Read;
+        exit;
+      end;
+    end;
+    Self.Refresh;
+    Self.Read;
+  end;
+end;
+
+procedure TAcervosEx.PostDelete;
+begin
+  FState := stDBWait;
+  with DataModule_Biblio.ADOCommand_Explorer, FDataRecord do
+  begin
+    DataModule_Biblio.ADODataSet_Explorer.Close;
+    {apaga registro na Tabela}
+    CommandText :=
+      'DELETE FROM ' +
+      '  ACERVO ' +
+      'WHERE ' +
+      '  TOMBO = ' + IntToStr(Tombo);
+    try
+      Execute;
+    except
+      on E: Exception do
+      begin
+        with Application do
+          MessageBox(PChar(MSG_ERRODELETE + E.Message),
+                     CAP_ERRODB,MB_OKICONSTOP);
+        Self.RollBackTrans;
+        FState := stRead;
+        Self.Refresh;
+        Self.Read;
+        Screen.Cursor := crDefault;
+        exit;
+      end;
+    end;
+  end;
+end;
+
+procedure TAcervosEx.Post;
+begin
+  {grava o registro atual no banco de dados}
+  if (FState = stRead) or (FState = stDBWait) then
+    exit;
+  Screen.Cursor := crSQLWait;
+  case FState of
+    stInsert: PostInsert;
+    stDelete: PostDelete;
+    stEdit: PostEdit;
+  end;
+  FState := stRead;
+  Screen.Cursor := crDefault;
+end;
+
+procedure TAcervosEx.Search(var ADODataSet: TADODataSet; FilterStr: String);
+begin
+  Screen.Cursor := crSQLWait;
+  FState := stDBWait;
+  with DataModule_Biblio do
+  begin
+    ADODataSet.Close;
+    ADODataSet.Connection := ADOConnection_Biblio;
+    with ADOCommand_Explorer do
+    begin
+      CommandText :=
+        'SELECT ' +
+        '  A.TOMBO AS Tombo, A.TITULO AS Título, ' +
+        '  A.AUTOR AS Autor, A.EDITORA AS Editora, ' +
+        '  A.COLECAO AS Coleção, A.VOLUME AS Volume, A.EDICAO AS Edição, ' +
+        '  A.ANO AS Ano, A.PAGINAS AS Páginas, A.ASSUNTO AS Assunto, ' +
+        '  A.LOCALIZACAO AS Localização, A.SITUACAO AS Situação, ' +
+        '  A.DATACADASTRO AS Data_de_Cadastro, ' +
+        '  T.DESCRICAO AS Tipo_de_Acervo, TA.DESCRICAO AS Área_de_Acervo, ' +
+        '  TC.DESCRICAO AS Classificação_de_Acervo, F.NOME AS Fornecedor, ' +
+        '  A.TOMBO AS Idx ' +
+        'FROM ' +
+        '  ACERVO A, TIPOACERVO T, TIPOAREA TA, ' +
+        '  TIPOCLASSIFICACAO TC, FORNECEDOR F ' +
+        'WHERE ' +
+        '  (A.IDTIPOACERVO = T.IDTIPOACERVO) AND ' +
+        '  (A.IDAREA = TA.IDAREA) AND ' +
+        '  (A.IDCLASSIFICACAO = TC.IDCLASSIFICACAO) AND ' +
+        '  (A.IDFORNEC = F.IDFORNEC) ';
+      if FilterStr <> '' then
+        CommandText := CommandText + ' AND (' + FilterStr + ')';
+      CommandText := CommandText + ' ORDER BY A.TITULO, A.TOMBO';
+      try
+        ADODataSet.RecordSet := Execute;
+      except
+        on E: Exception do
+        begin
+          with Application do
+            MessageBox(PChar(MSG_ERROSELECT + E.Message),
+                       CAP_ERRODB,MB_OKICONSTOP);
+          Self.RollBackTrans;
+          Screen.Cursor := crDefault;
+          FState := stRead;
+          exit;
+        end;
+      end;
+    end;
+    ADODataSet.Open;
+    Screen.Cursor := crDefault;
+    FState := stRead;
+  end;
+end;
+
+procedure TAcervosEx.LocateTombo(Tmb: Integer);
 var st: Integer;
 begin
   Screen.Cursor := crSQLWait;
   st := FState;
   FState := stDBWait;
-  SetLength(Classes.TipoAcervo,0);
-  SetLength(Classes.AreaAcervo,0);
-  SetLength(Classes.ClassificacaoAcervo,0);
   with DataModule_Biblio do
   begin
     with ADODataSet_Exemplares, ADOCommand_Exemplares do
@@ -2872,13 +3542,16 @@ begin
       ADODataSet_Exemplares.Close;
       CommandText :=
         'SELECT ' +
-        '  TA.DESCRICAO ' +
+        '  TITULO,' +
+        '  AUTOR,' +
+        '  EDITORA,' +
+        '  COLECAO,' +
+        '  VOLUME,' +
+        '  EDICAO ' +
         'FROM ' +
-        '  ACERVO A, TIPOACERVO TA ' +
+        '  ACERVO ' +
         'WHERE ' +
-        '  TA.IDTIPOACERVO =  A.IDTIPOACERVO ' +
-        'GROUP BY TA.DESCRICAO ' +
-        'ORDER BY TA.DESCRICAO';
+        '  TOMBO = ' + IntToStr(Tmb);
       try
         RecordSet := Execute;
       except
@@ -2894,27 +3567,43 @@ begin
         end;
       end;
       Open;
-      First;
-      while (not IsEmpty) and (not Eof) do
-      begin
-        with Classes do
-        begin
-          SetLength(TipoAcervo,Length(TipoAcervo) + 1);
-          TipoAcervo[Length(TipoAcervo) - 1] :=
-            FieldByName('Descricao').AsString;
-        end;
-        Next;
-      end;
+      if not IsEmpty then
+        DataModule_Biblio.ADODataSet_Explorer.Locate(
+            'TITULO;AUTOR;EDITORA;COLECAO;VOLUME;EDICAO',
+            VarArrayOf([FieldByName('Titulo').AsString,
+                        FieldByName('Autor').AsString,
+                        FieldByName('Editora').AsString,
+                        FieldByName('Colecao').AsString,
+                        FieldByName('Volume').AsInteger,
+                        FieldByName('Edicao').AsInteger]),[]);
       Close;
+      Screen.Cursor := crDefault;
+      FState := st;
+    end;
+  end;
+  Self.Read;
+end;
+
+function TAcervosEx.Exists(Tmb: Integer): Boolean;
+var st: Integer;
+begin
+  {retorna True se tombo existe}
+  Result := False;
+  Screen.Cursor := crSQLWait;
+  st := FState;
+  FState := stDBWait;
+  with DataModule_Biblio do
+  begin
+    with ADODataSet_Exemplares, ADOCommand_Exemplares do
+    begin
+      ADODataSet_Exemplares.Close;
       CommandText :=
         'SELECT ' +
-        '  AA.DESCRICAO ' +
+        '  TOMBO ' +
         'FROM ' +
-        '  ACERVO A, TIPOAREA AA ' +
+        '  ACERVO ' +
         'WHERE ' +
-        '  AA.IDAREA =  A.IDAREA ' +
-        'GROUP BY AA.DESCRICAO ' +
-        'ORDER BY AA.DESCRICAO';
+        '  TOMBO = ' + IntToStr(Tmb);
       try
         RecordSet := Execute;
       except
@@ -2930,27 +3619,50 @@ begin
         end;
       end;
       Open;
-      First;
-      while (not IsEmpty) and (not Eof) do
-      begin
-        with Classes do
-        begin
-          SetLength(AreaAcervo,Length(AreaAcervo) + 1);
-          AreaAcervo[Length(AreaAcervo) - 1] :=
-            FieldByName('Descricao').AsString;
-        end;
-        Next;
-      end;
+      if not IsEmpty then
+        Result := True;
       Close;
+      Screen.Cursor := crDefault;
+      FState := st;
+    end;
+  end;
+end;
+
+procedure TAcervosEx.GetExemplares(var Exemplares: TExemplares);
+var st: Integer;
+begin
+  Screen.Cursor := crSQLWait;
+  st := FState;
+  FState := stDBWait;
+  with DataModule_Biblio do
+  begin
+    with ADODataSet_Exemplares, ADOCommand_Exemplares,
+         FDataRecord, FDataRecord.TipoAcervo, FDataRecord.AreaAcervo,
+         FDataRecord.ClassificacaoAcervo, FDataRecord.Fornecedor do
+    begin
+      ADODataSet_Exemplares.Close;
       CommandText :=
         'SELECT ' +
-        '  CA.DESCRICAO ' +
+        '  TOMBO, SITUACAO ' +
         'FROM ' +
-        '  ACERVO A, TIPOCLASSIFICACAO CA ' +
+        '  ACERVO ' +
         'WHERE ' +
-        '  CA.IDCLASSIFICACAO =  A.IDCLASSIFICACAO ' +
-        'GROUP BY CA.DESCRICAO ' +
-        'ORDER BY CA.DESCRICAO';
+        '  TITULO = ' + #39 + Titulo + #39 + ' AND ' +
+        '  AUTOR = ' + #39 + Autor + #39 + ' AND ' +
+        '  EDITORA = ' + #39 + Editora + #39 + ' AND ' +
+        '  COLECAO = ' + #39 + Colecao + #39 + ' AND ' +
+        '  VOLUME = ' + IntToStr(Volume) + ' AND ' +
+        '  EDICAO = ' + IntToStr(Edicao) + ' AND ' +
+        '  ANO = ' + IntToStr(Ano) + ' AND ' +
+        '  PAGINAS = ' + IntToStr(Paginas) + ' AND ' +
+        '  ASSUNTO = ' + #39 + Assunto + #39 + ' AND ' +
+        '  FAIXAETARIA = ' + #39 + FaixaEtaria + #39 + ' AND ' +
+        '  LOCALIZACAO = ' + #39 + Localizacao + #39 + ' AND ' +
+        '  IDTIPOACERVO = ' + IntToStr(IdTipoAcervo) + ' AND ' +
+        '  IDAREA = ' + IntToStr(IdArea) + ' AND ' +
+        '  IDCLASSIFICACAO = ' + IntToStr(IdClassificacao) + ' AND ' +
+        '  IDFORNEC = ' + IntToStr(IdFornec) + ' ' +
+        'ORDER BY TOMBO';
       try
         RecordSet := Execute;
       except
@@ -2967,13 +3679,14 @@ begin
       end;
       Open;
       First;
+      SetLength(Exemplares,0);
       while (not IsEmpty) and (not Eof) do
       begin
-        with Classes do
+        SetLength(Exemplares,Length(Exemplares) + 1);
+        with Exemplares[Length(Exemplares) - 1] do
         begin
-          SetLength(ClassificacaoAcervo,Length(ClassificacaoAcervo) + 1);
-          ClassificacaoAcervo[Length(ClassificacaoAcervo) - 1] :=
-            FieldByName('Descricao').AsString;
+          Tombo := FieldByName('Tombo').AsInteger;
+          Situacao := FieldByName('Situacao').AsString[1];
         end;
         Next;
       end;
@@ -2984,7 +3697,7 @@ begin
   end;
 end;
 
-procedure TAcervos.GetTitulos(Tipo,Area,Classificacao: String);
+procedure TAcervosEx.GetTitulos(Tipo,Area,Classificacao: String);
 begin
   {lê o banco de dados e atribui valores a classe de Dados}
   with DataModule_Biblio.ADODataSet_Explorer,
@@ -3042,7 +3755,7 @@ begin
     Open;
     First;
   end;
-  Self.Read(True);
+  Self.Read;
   FState := stRead;
   Screen.Cursor := crDefault;
 end;
@@ -3057,7 +3770,7 @@ begin
   DataModule_Biblio.ADODataSet_TipoUsuarios.Close;
 end;
 
-procedure TTipoUsuarios.GotoReg(RecIndex: Integer; Explorer: Boolean = False);
+procedure TTipoUsuarios.GotoReg(RecIndex: Integer);
 begin
   {reabre dataset, se necessário}
   Self.Refresh;
@@ -3139,7 +3852,7 @@ begin
     Result := (RecNo = RecordCount);
 end;
 
-function TTipoUsuarios.RecCount(Explorer: Boolean = False): Integer;
+function TTipoUsuarios.RecCount: Integer;
 begin
   {retorna a quantidade de registros}
   with DataModule_Biblio.ADODataSet_TipoUsuarios do
@@ -3200,7 +3913,7 @@ begin
   Screen.Cursor := crDefault;
 end;
 
-procedure TTipoUsuarios.Read(Explorer: Boolean = False);
+procedure TTipoUsuarios.Read;
 begin
   {lê registro atual}
   with DataModule_Biblio.ADODataSet_TipoUsuarios, FDataRecord do
@@ -3425,7 +4138,7 @@ begin
   DataModule_Biblio.ADODataSet_TipoFornecedores.Close;
 end;
 
-procedure TTipoFornecedores.GotoReg(RecIndex: Integer; Explorer: Boolean = False);
+procedure TTipoFornecedores.GotoReg(RecIndex: Integer);
 begin
   {reabre dataset, se necessário}
   Self.Refresh;
@@ -3507,7 +4220,7 @@ begin
     Result := (RecNo = RecordCount);
 end;
 
-function TTipoFornecedores.RecCount(Explorer: Boolean = False): Integer;
+function TTipoFornecedores.RecCount: Integer;
 begin
   {retorna a quantidade de registros}
   with DataModule_Biblio.ADODataSet_TipoFornecedores do
@@ -3568,7 +4281,7 @@ begin
   Screen.Cursor := crDefault;
 end;
 
-procedure TTipoFornecedores.Read(Explorer: Boolean = False);
+procedure TTipoFornecedores.Read;
 begin
   {lê registro atual}
   with DataModule_Biblio.ADODataSet_TipoFornecedores, FDataRecord do
@@ -3778,7 +4491,7 @@ begin
   DataModule_Biblio.ADODataSet_TipoAcervos.Close;
 end;
 
-procedure TTipoAcervos.GotoReg(RecIndex: Integer; Explorer: Boolean = False);
+procedure TTipoAcervos.GotoReg(RecIndex: Integer);
 begin
   {reabre dataset, se necessário}
   Self.Refresh;
@@ -3860,7 +4573,7 @@ begin
     Result := (RecNo = RecordCount);
 end;
 
-function TTipoAcervos.RecCount(Explorer: Boolean = False): Integer;
+function TTipoAcervos.RecCount: Integer;
 begin
   {retorna a quantidade de registros}
   with DataModule_Biblio.ADODataSet_TipoAcervos do
@@ -3921,7 +4634,7 @@ begin
   Screen.Cursor := crDefault;
 end;
 
-procedure TTipoAcervos.Read(Explorer: Boolean = False);
+procedure TTipoAcervos.Read;
 begin
   {lê registro atual}
   with DataModule_Biblio.ADODataSet_TipoAcervos, FDataRecord do
@@ -4136,7 +4849,7 @@ begin
   DataModule_Biblio.ADODataSet_AreaAcervos.Close;
 end;
 
-procedure TAreaAcervos.GotoReg(RecIndex: Integer; Explorer: Boolean = False);
+procedure TAreaAcervos.GotoReg(RecIndex: Integer);
 begin
   {reabre dataset, se necessário}
   Self.Refresh;
@@ -4218,7 +4931,7 @@ begin
     Result := (RecNo = RecordCount);
 end;
 
-function TAreaAcervos.RecCount(Explorer: Boolean = False): Integer;
+function TAreaAcervos.RecCount: Integer;
 begin
   {retorna a quantidade de registros}
   with DataModule_Biblio.ADODataSet_AreaAcervos do
@@ -4279,7 +4992,7 @@ begin
   Screen.Cursor := crDefault;
 end;
 
-procedure TAreaAcervos.Read(Explorer: Boolean = False);
+procedure TAreaAcervos.Read;
 begin
   {lê registro atual}
   with DataModule_Biblio.ADODataSet_AreaAcervos, FDataRecord do
@@ -4489,7 +5202,7 @@ begin
   DataModule_Biblio.ADODataSet_ClassificacaoAcervos.Close;
 end;
 
-procedure TClassificacaoAcervos.GotoReg(RecIndex: Integer; Explorer: Boolean = False);
+procedure TClassificacaoAcervos.GotoReg(RecIndex: Integer);
 begin
   {reabre dataset, se necessário}
   Self.Refresh;
@@ -4571,7 +5284,7 @@ begin
     Result := (RecNo = RecordCount);
 end;
 
-function TClassificacaoAcervos.RecCount(Explorer: Boolean = False): Integer;
+function TClassificacaoAcervos.RecCount: Integer;
 begin
   {retorna a quantidade de registros}
   with DataModule_Biblio.ADODataSet_ClassificacaoAcervos do
@@ -4632,7 +5345,7 @@ begin
   Screen.Cursor := crDefault;
 end;
 
-procedure TClassificacaoAcervos.Read(Explorer: Boolean = False);
+procedure TClassificacaoAcervos.Read;
 begin
   {lê registro atual}
   with DataModule_Biblio.ADODataSet_ClassificacaoAcervos, FDataRecord do
@@ -4842,7 +5555,7 @@ begin
   DataModule_Biblio.ADODataSet_GrupoLogins.Close;
 end;
 
-procedure TGrupoLogins.GotoReg(RecIndex: Integer; Explorer: Boolean = False);
+procedure TGrupoLogins.GotoReg(RecIndex: Integer);
 begin
   {reabre dataset, se necessário}
   Self.Refresh;
@@ -4924,7 +5637,7 @@ begin
     Result := (RecNo = RecordCount);
 end;
 
-function TGrupoLogins.RecCount(Explorer: Boolean = False): Integer;
+function TGrupoLogins.RecCount: Integer;
 begin
   {retorna a quantidade de registros}
   with DataModule_Biblio.ADODataSet_GrupoLogins do
@@ -4985,7 +5698,7 @@ begin
   Screen.Cursor := crDefault;
 end;
 
-procedure TGrupoLogins.Read(Explorer: Boolean = False);
+procedure TGrupoLogins.Read;
 begin
   {lê registro atual}
   with DataModule_Biblio.ADODataSet_GrupoLogins, FDataRecord do
@@ -5200,7 +5913,7 @@ begin
   DataModule_Biblio.ADODataSet_ContaLogins.Close;
 end;
 
-procedure TContaLogins.GotoReg(RecIndex: Integer; Explorer: Boolean = False);
+procedure TContaLogins.GotoReg(RecIndex: Integer);
 begin
   {reabre dataset, se necessário}
   Self.Refresh;
@@ -5282,7 +5995,7 @@ begin
     Result := (RecNo = RecordCount);
 end;
 
-function TContaLogins.RecCount(Explorer: Boolean = False): Integer;
+function TContaLogins.RecCount: Integer;
 begin
   {retorna a quantidade de registros}
   with DataModule_Biblio.ADODataSet_ContaLogins do
@@ -5349,7 +6062,7 @@ begin
   Screen.Cursor := crDefault;
 end;
 
-procedure TContaLogins.Read(Explorer: Boolean = False);
+procedure TContaLogins.Read;
 begin
   {lê registro atual}
   with DataModule_Biblio.ADODataSet_ContaLogins, FDataRecord do
@@ -5597,6 +6310,1220 @@ begin
   end;
 end;
 
+{-------------------- TClasseAcervo -----------------------}
+
+constructor TClasseAcervo.Create;
+begin
+  inherited Create;
+  SetLength(Acervos,0);
+end;
+
+destructor TClasseAcervo.Destroy;
+var i: Integer;
+begin
+  for i := 0 to Length(Acervos) - 1 do
+    Acervos[i].Free;
+  SetLength(Acervos,0);
+  inherited Destroy;
+end;
+
+procedure TClasseAcervo.Assign(Source: TClasseAcervo);
+var i: Integer;
+begin
+  {copia as propriedades de um outro TClasseAcervo}
+  Tipo := Source.Tipo;
+  Area := Source.Area;
+  Classificacao := Source.Classificacao;
+  for i := 0 to Length(Acervos) - 1 do
+    Acervos[i].Free;
+  SetLength(Acervos,Length(Source.Acervos));
+  for i := 0 to Length(Acervos) - 1 do
+  begin
+    Acervos[i] := TAcervo.Create;
+    Acervos[i].Assign(Source.Acervos[i]);
+  end;
+end;
+
+{-------------------- TClasseAcervos -----------------------}
+
+constructor TClasseAcervos.Create;
+begin
+  inherited Create;
+  {inicializa valores}
+  FDataRecord := TClasseAcervo.Create;
+  FAcervos := TAcervosEx.Create;
+  DataModule_Biblio.ADODataSet_ClasseAcervos.Close;
+end;
+
+destructor TClasseAcervos.Destroy;
+begin
+  FDataRecord.Free;
+  FAcervos.Free;
+  inherited Destroy;
+end;
+
+procedure TClasseAcervos.GotoReg(RecIndex: Integer);
+begin
+  {reabre dataset, se necessário}
+  Self.Refresh;
+  {move cursor para o indice dado}
+  with DataModule_Biblio.ADODataSet_ClasseAcervos do
+    if (RecIndex > 0) and (RecIndex <= RecordCount) then
+      RecNo := RecIndex;
+  {lê o registro}
+  Self.Read;
+end;
+
+procedure TClasseAcervos.First;
+begin
+  {reabre dataset, se necessário}
+  Self.Refresh;
+  {move cursor}
+  with DataModule_Biblio.ADODataSet_ClasseAcervos do
+    First;
+  {lê o registro}
+  Self.Read;
+end;
+
+procedure TClasseAcervos.Last;
+begin
+  {reabre dataset, se necessário}
+  Self.Refresh;
+  {move cursor}
+  with DataModule_Biblio.ADODataSet_ClasseAcervos do
+    Last;
+  {lê o registro}
+  Self.Read;
+end;
+
+procedure TClasseAcervos.Prior;
+begin
+  {reabre dataset, se necessário}
+  Self.Refresh;
+  {move cursor}
+  with DataModule_Biblio.ADODataSet_ClasseAcervos do
+    Prior;
+  {lê o registro}
+  Self.Read;
+end;
+
+procedure TClasseAcervos.Next;
+begin
+  {reabre dataset, se necessário}
+  Self.Refresh;
+  {move cursor}
+  with DataModule_Biblio.ADODataSet_ClasseAcervos do
+    Next;
+  {lê o registro}
+  Self.Read;
+end;
+
+function TClasseAcervos.GetRegistro: TClasseAcervo;
+begin
+  {permite acesso ao registro}
+  Result := FDataRecord;
+end;
+
+function TClasseAcervos.Bof: Boolean;
+begin
+  {retorna True se for o primeiro registro}
+  with DataModule_Biblio.ADODataSet_ClasseAcervos do
+    Result := (RecNo = 1);
+end;
+
+function TClasseAcervos.Eof: Boolean;
+begin
+  {retorna True se for o último registro}
+  with DataModule_Biblio.ADODataSet_ClasseAcervos do
+    Result := (RecNo = RecordCount);
+end;
+
+function TClasseAcervos.RecCount: Integer;
+begin
+  {retorna a quantidade de registros}
+  with DataModule_Biblio.ADODataSet_ClasseAcervos do
+    Result := RecordCount;
+end;
+
+function TClasseAcervos.GetRecNo: Integer;
+begin
+  {retorna numero do reg atual}
+  with DataModule_Biblio.ADODataSet_ClasseAcervos do
+    Result := RecNo;
+end;
+
+procedure TClasseAcervos.Refresh;
+begin
+  {lê o banco de dados e atribui valores a classe de Dados}
+  with DataModule_Biblio.ADODataSet_ClasseAcervos,
+       DataModule_Biblio.ADOCommand_ClasseAcervos do
+  begin
+    if DataModule_Biblio.ADODataSet_ClasseAcervos.Active then
+      Close;
+    FState := stDBWait;
+    Screen.Cursor := crSQLWait;
+    CommandText :=
+      'SELECT ' +
+      '  TA.DESCRICAO AS TIPO, ' +
+      '  AA.DESCRICAO AS AREA, ' +
+      '  CA.DESCRICAO AS CLASSIFICACAO ' +
+      'FROM ' +
+      '  ACERVO A, TIPOACERVO TA, TIPOAREA AA, TIPOCLASSIFICACAO CA ' +
+      'WHERE ' +
+      '  A.IDTIPOACERVO = TA.IDTIPOACERVO AND ' +
+      '  A.IDAREA = AA.IDAREA AND ' +
+      '  A.IDCLASSIFICACAO = CA.IDCLASSIFICACAO ' +
+      'GROUP BY TA.DESCRICAO, AA.DESCRICAO, CA.DESCRICAO ' +
+      'ORDER BY TA.DESCRICAO, AA.DESCRICAO, CA.DESCRICAO';
+    try
+      RecordSet := Execute;
+    except
+      on E: Exception do
+      begin
+        with Application do
+          MessageBox(PChar(MSG_ERROSELECT + E.Message),
+                     CAP_ERRODB,MB_OKICONSTOP);
+        Self.RollBackTrans;
+        FState := stRead;
+        Screen.Cursor := crDefault;
+        exit;
+      end;
+    end;
+    Open;
+    First;
+  end;
+  FAcervos.Refresh;
+  Self.Read;
+  FState := stRead;
+  Screen.Cursor := crDefault;
+end;
+
+procedure TClasseAcervos.Read;
+var i: Integer;
+begin
+  {lê registro atual}
+  with DataModule_Biblio.ADODataSet_ClasseAcervos, FDataRecord do
+  begin
+    if (not Active) or
+       (DataModule_Biblio.ADODataSet_ClasseAcervos.RecordCount = 0) then
+      exit;
+    Tipo := FieldByName('Tipo').AsString;
+    Area := FieldByName('Area').AsString;
+    Classificacao := FieldByName('Classificacao').AsString;
+    for i := 0 to Length(Acervos) - 1 do
+      Acervos[i].Free;
+    SetLength(Acervos,0);
+    FAcervos.GetTitulos(Tipo,Area,Classificacao);
+    for i := 1 to FAcervos.RecCount do
+    begin
+      SetLength(Acervos,Length(Acervos) + 1);
+      Acervos[Length(Acervos) - 1] := TAcervo.Create;
+      with Acervos[Length(Acervos) - 1] do
+      begin
+        FAcervos.GotoReg(i);
+        Assign(FAcervos.Registro);
+      end;
+    end;
+  end;
+end;
+
+procedure TClasseAcervos.LocateTombo(Tombo: Integer);
+begin
+  with DataModule_Biblio do
+  begin
+    with ADODataSet_Exemplares, ADOCommand_Exemplares do
+    begin
+      ADODataSet_Exemplares.Close;
+      CommandText :=
+        'SELECT ' +
+        '  A.TITULO,' +
+        '  A.AUTOR,' +
+        '  A.EDITORA,' +
+        '  A.COLECAO,' +
+        '  A.VOLUME,' +
+        '  A.EDICAO, ' +
+        '  TA.DESCRICAO AS TIPO, ' +
+        '  AA.DESCRICAO AS AREA, ' +
+        '  CA.DESCRICAO AS CLASSIFICACAO ' +
+        'FROM ' +
+        '  ACERVO A, TIPOACERVO TA, TIPOAREA AA, TIPOCLASSIFICACAO CA ' +
+        'WHERE ' +
+        '  A.IDTIPOACERVO = TA.IDTIPOACERVO AND ' +
+        '  A.IDAREA = AA.IDAREA AND ' +
+        '  A.IDCLASSIFICACAO = CA.IDCLASSIFICACAO AND ' +
+        '  A.TOMBO = ' + IntToStr(Tombo);
+      try
+        RecordSet := Execute;
+      except
+        on E: Exception do
+        begin
+          with Application do
+            MessageBox(PChar(MSG_ERROSELECT + E.Message),
+                       CAP_ERRODB,MB_OKICONSTOP);
+          exit;
+        end;
+      end;
+      Open;
+      if not IsEmpty then
+        DataModule_Biblio.ADODataSet_Explorer.Locate(
+            'TITULO;AUTOR;EDITORA;COLECAO;VOLUME;EDICAO',
+            VarArrayOf([FieldByName('Titulo').AsString,
+                        FieldByName('Autor').AsString,
+                        FieldByName('Editora').AsString,
+                        FieldByName('Colecao').AsString,
+                        FieldByName('Volume').AsInteger,
+                        FieldByName('Edicao').AsInteger]),[]);
+        DataModule_Biblio.ADODataSet_ClasseAcervos.Locate(
+            'TIPO;AREA;CLASSIFICACAO',
+            VarArrayOf([FieldByName('TIPO').AsString,
+                        FieldByName('AREA').AsString,
+                        FieldByName('CLASSIFICACAO').AsString]),[]);
+      Close;
+    end;
+  end;
+end;
+
+{-------------------- TMovData -----------------------}
+
+function TMovData.RGAToUsuario(RGA: String): String;
+begin
+  with DataModule_Biblio.ADODataSet_MovData,
+       DataModule_Biblio.ADOCommand_MovData do
+  begin
+    Close;
+    CommandText :=
+      'SELECT NOME FROM USUARIO WHERE RGA = ' + #39 + RGA + #39;
+    Screen.Cursor := crSQLWait;
+    try
+      RecordSet := Execute;
+    except
+      on E: Exception do
+      begin
+        with Application do
+          MessageBox(PChar(MSG_ERROSELECT + E.Message),
+                     CAP_ERRODB,MB_OKICONSTOP);
+        Self.RollBackTrans;
+        Screen.Cursor := crDefault;
+        exit;
+      end;
+    end;
+    Open;
+    if IsEmpty then
+      Result := ''
+    else
+      Result := FieldByName('Nome').AsString;
+    Close;
+    Screen.Cursor := crDefault;
+  end;
+end;
+
+function TMovData.UsuarioToRGA(Usuario: String): String;
+begin
+  with DataModule_Biblio.ADODataSet_MovData,
+       DataModule_Biblio.ADOCommand_MovData do
+  begin
+    UltimoErro := '';
+    Close;
+    CommandText :=
+      'SELECT RGA FROM USUARIO WHERE NOME = ' + #39 + Usuario + #39;
+    Screen.Cursor := crSQLWait;
+    try
+      RecordSet := Execute;
+    except
+      on E: Exception do
+      begin
+        with Application do
+          MessageBox(PChar(MSG_ERROSELECT + E.Message),
+                     CAP_ERRODB,MB_OKICONSTOP);
+        Self.RollBackTrans;
+        Screen.Cursor := crDefault;
+        exit;
+      end;
+    end;
+    Open;
+    if IsEmpty then
+    begin
+      Result := '';
+      UltimoErro := 'Não existe o usuário especificado no cadastro. ' + #13#10 +
+                    'Talvez tenha sido digitado incorretamente.';
+    end
+    else
+      Result := FieldByName('RGA').AsString;
+    Close;
+    Screen.Cursor := crDefault;
+  end;
+end;
+
+function TMovData.QtdEmpUsuario(Usuario: String): Integer;
+begin
+  with DataModule_Biblio.ADODataSet_MovData,
+       DataModule_Biblio.ADOCommand_MovData do
+  begin
+    Result := -1;
+    Close;
+    CommandText :=
+      'SELECT COUNT(R.TOMBO) AS QTD FROM ' +
+      'RETIRADA R , USUARIO U ' +
+      'WHERE U.NOME = ' + #39 + Usuario + #39 + ' AND ' +
+      'U.IDUSUARIO = R.IDUSUARIO';
+    try
+      RecordSet := Execute;
+    except
+      on E: Exception do
+      begin
+        with Application do
+          MessageBox(PChar(MSG_ERROSELECT + E.Message),
+                     CAP_ERRODB,MB_OKICONSTOP);
+        Self.RollBackTrans;
+        exit;
+      end;
+    end;
+    Open;
+    Result := FieldByName('QTD').AsInteger;
+    Close;
+  end;
+end;
+
+procedure TMovData.ListaReserva(var Lista: TStringList; Tombo: Integer);
+begin
+  with DataModule_Biblio.ADODataSet_MovData,
+       DataModule_Biblio.ADOCommand_MovData do
+  begin
+    Lista.Clear;
+    Close;
+    CommandText :=
+      'SELECT DISTINCT U.NOME FROM ' +
+      'RESERVA R , USUARIO U ' +
+      'WHERE R.TOMBO = ' + IntToStr(Tombo) + ' AND ' +
+      'U.IDUSUARIO = R.IDUSUARIO';
+    Screen.Cursor := crSQLWait;
+    try
+      RecordSet := Execute;
+    except
+      on E: Exception do
+      begin
+        with Application do
+          MessageBox(PChar(MSG_ERROSELECT + E.Message),
+                     CAP_ERRODB,MB_OKICONSTOP);
+        Self.RollBackTrans;
+        Screen.Cursor := crDefault;
+        exit;
+      end;
+    end;
+    Open;
+    while not Eof do
+    begin
+      Lista.Add(FieldByName('Nome').AsString);
+      Next;
+    end;
+    Close;
+    Screen.Cursor := crDefault;
+  end;
+end;
+
+function TMovData.Emprestar(Tombo: Integer; Usuario: String): Boolean;
+var tmpi, tmpi2: Integer;
+    tmpstr: String;
+begin
+{ Verifica:
+  -se pode emprestar
+  -se já emprestado
+  -se perdido
+  -suspende usuario de acordo c/ outros exemplares
+  -se usuario está suspenso
+  -se qtd exempl. usuario > qtd max.
+  -verifica lista de reservas
+  Transação:
+  *muda status de acervo
+  *retira livro da reserva (se confirmado)
+  *grava tabela Retirada
+}
+  with DataModule_Biblio.ADODataSet_MovData,
+       DataModule_Biblio.ADOCommand_MovData do
+  begin
+    UltimoErro := '';
+    Result := False;
+    Close;
+    Screen.Cursor := crSQLWait;
+    CommandText :=
+      'SELECT TA.DESCRICAO FROM ' +
+      'ACERVO A, TIPOACERVO TA ' +
+      'WHERE A.TOMBO = ' + IntToStr(Tombo) + ' AND ' +
+      'A.IDTIPOACERVO = TA.IDTIPOACERVO AND ' +
+      'TA.PODEEMPRESTAR = FALSE';
+    try
+      RecordSet := Execute;
+    except
+      on E: Exception do
+      begin
+        with Application do
+          MessageBox(PChar(MSG_ERROSELECT + E.Message),
+                     CAP_ERRODB,MB_OKICONSTOP);
+        Screen.Cursor := crDefault;
+        exit;
+      end;
+    end;
+    Open;
+    if not IsEmpty then
+    begin
+      UltimoErro :=
+        'O Tipo de Acervo "' + FieldByName('Descricao').AsString +
+        '" não pode ser emprestado.';
+      Close;
+      Screen.Cursor := crDefault;
+      exit;
+    end;
+    Close;
+    CommandText :=
+      'SELECT TOMBO FROM ' +
+      'RETIRADA ' +
+      'WHERE TOMBO = ' + IntToStr(Tombo);
+    try
+      RecordSet := Execute;
+    except
+      on E: Exception do
+      begin
+        with Application do
+          MessageBox(PChar(MSG_ERROSELECT + E.Message),
+                     CAP_ERRODB,MB_OKICONSTOP);
+        Screen.Cursor := crDefault;
+        exit;
+      end;
+    end;
+    Open;
+    if not IsEmpty then
+    begin
+      UltimoErro := 'Exemplar do acervo já está emprestado.';
+      Close;
+      Screen.Cursor := crDefault;
+      exit;
+    end;
+    Close;
+    CommandText :=
+      'SELECT TOMBO FROM ' +
+      'ACERVOPERDIDO ' +
+      'WHERE TOMBO = ' + IntToStr(Tombo);
+    try
+      RecordSet := Execute;
+    except
+      on E: Exception do
+      begin
+        with Application do
+          MessageBox(PChar(MSG_ERROSELECT + E.Message),
+                     CAP_ERRODB,MB_OKICONSTOP);
+        Screen.Cursor := crDefault;
+        exit;
+      end;
+    end;
+    Open;
+    if not IsEmpty then
+    begin
+      UltimoErro :=
+        'Exemplar do acervo não pode ser emprestado, ' +
+        'pois está no "Acervo Perdido".';
+      Close;
+      Screen.Cursor := crDefault;
+      exit;
+    end;
+    Close;
+    CommandText :=
+      'SELECT DISTINCT U.IDUSUARIO FROM ' +
+      'RETIRADA R, USUARIO U ' +
+      'WHERE R.IDUSUARIO = U.IDUSUARIO AND ' +
+      'U.NOME = ' + #39 + Usuario + #39 + ' AND ' +
+      'R.DATAPREVDEVOLUCAO < NOW';
+    try
+      RecordSet := Execute;
+    except
+      on E: Exception do
+      begin
+        with Application do
+          MessageBox(PChar(MSG_ERROSELECT + E.Message),
+                     CAP_ERRODB,MB_OKICONSTOP);
+        Screen.Cursor := crDefault;
+        exit;
+      end;
+    end;
+    Open;
+    if not IsEmpty then
+    begin
+      {suspende usuario}
+      tmpi := FieldByName('IdUsuario').AsInteger;
+      Close;
+      CommandText :=
+        'SELECT T.TEMPOSUSP ' +
+        'FROM TIPOUSUARIO T, USUARIO U ' +
+        'WHERE T.IDTIPOUSUARIO = U.IDTIPOUSUARIO AND ' +
+        'U.IDUSUARIO = ' + IntToStr(tmpi);
+      try
+        RecordSet := Execute;
+      except
+        on E: Exception do
+        begin
+          with Application do
+            MessageBox(PChar(MSG_ERROSELECT + E.Message),
+                       CAP_ERRODB,MB_OKICONSTOP);
+          Screen.Cursor := crDefault;
+          exit;
+        end;
+      end;
+      Open;
+      tmpi2 := FieldByName('TempoSusp').AsInteger;
+      Close;
+      if tmpi2 > 0 then
+      begin
+        CommandText :=
+          'UPDATE USUARIO ' +
+          'SET SITUACAO = ' + #39 + 'S' + #39 + ' , ' +
+          'DATAEXPIRASUSP = NOW + ' + IntToStr(tmpi2) + ' ' +
+          'WHERE IDUSUARIO = ' + IntToStr(tmpi);
+        try
+          Execute;
+        except
+          on E: Exception do
+          begin
+            with Application do
+              MessageBox(PChar(MSG_ERROUPDATE + E.Message),
+                         CAP_ERRODB,MB_OKICONSTOP);
+            Screen.Cursor := crDefault;
+            exit;
+          end;
+        end;
+      end;
+    end;
+    Close;
+    CommandText :=
+      'SELECT IDUSUARIO FROM ' +
+      'USUARIO ' +
+      'WHERE NOME = ' + #39 + Usuario + #39 + ' AND ' +
+      'SITUACAO <> ' + #39 + 'N' + #39;
+    try
+      RecordSet := Execute;
+    except
+      on E: Exception do
+      begin
+        with Application do
+          MessageBox(PChar(MSG_ERROSELECT + E.Message),
+                     CAP_ERRODB,MB_OKICONSTOP);
+        Screen.Cursor := crDefault;
+        exit;
+      end;
+    end;
+    Open;
+    if not IsEmpty then
+    begin
+      UltimoErro := 'Usuário não pode retirar exemplar, pois está suspenso.';
+      Close;
+      Screen.Cursor := crDefault;
+      exit;
+    end;
+    Close;
+    CommandText :=
+      'SELECT T.MAXEXEMPLARES ' +
+      'FROM TIPOUSUARIO T, USUARIO U ' +
+      'WHERE T.IDTIPOUSUARIO = U.IDTIPOUSUARIO AND ' +
+      'U.NOME = ' + #39 + Usuario + #39 + ' AND ' +
+      'T.MAXEXEMPLARES <= ' + IntToStr(QtdEmpUsuario(Usuario));
+    try
+      RecordSet := Execute;
+    except
+      on E: Exception do
+      begin
+        with Application do
+          MessageBox(PChar(MSG_ERROSELECT + E.Message),
+                     CAP_ERRODB,MB_OKICONSTOP);
+        Screen.Cursor := crDefault;
+        exit;
+      end;
+    end;
+    Open;
+    if (not IsEmpty) and (FieldByName('MaxExemplares').AsInteger <> 0) then
+    begin
+      UltimoErro := 'Usuário não pode retirar mais do que ' +
+        IntToStr(FieldByName('MaxExemplares').AsInteger) + ' exemplares.';
+      Close;
+      Screen.Cursor := crDefault;
+      exit;
+    end;
+    Close;
+    CommandText :=
+      'SELECT DISTINCT U.NOME FROM ' +
+      'RESERVA R, USUARIO U ' +
+      'WHERE R.TOMBO = ' + IntToStr(Tombo) + ' AND ' +
+      'U.IDUSUARIO = R.IDUSUARIO';
+    try
+      RecordSet := Execute;
+    except
+      on E: Exception do
+      begin
+        with Application do
+          MessageBox(PChar(MSG_ERROSELECT + E.Message),
+                     CAP_ERRODB,MB_OKICONSTOP);
+        Screen.Cursor := crDefault;
+        exit;
+      end;
+    end;
+    Open;
+    if not IsEmpty then
+    begin
+      tmpstr := FieldByName('Nome').AsString;
+      while not Eof do
+      begin
+        Next;
+        if Eof then break;
+        tmpstr := tmpstr + ', ' + FieldByName('Nome').AsString;
+      end;
+      with Application do
+      begin
+        if MessageBox(PChar(MSG_EXEMPRESERVADO + tmpstr + #13#10 +
+                      MSG_EXEMPRESERVADO1), 'Confirmação',
+                      MB_YESNOQUESTION) = IDNO then
+        begin
+          UltimoErro := '';
+          Close;
+          Screen.Cursor := crDefault;
+          exit;
+        end;
+      end;
+    end;
+    Close;
+    {Faz o Empréstimo}
+    BeginTrans;
+    CommandText :=
+      'UPDATE ACERVO ' +
+      'SET SITUACAO = ' + #39 + 'E' + #39 + ' ' +
+      'WHERE TOMBO = ' + IntToStr(Tombo);
+    try
+      Execute;
+    except
+      on E: Exception do
+      begin
+        with Application do
+          MessageBox(PChar(MSG_ERROUPDATE + E.Message),
+                     CAP_ERRODB,MB_OKICONSTOP);
+        Screen.Cursor := crDefault;
+        RollBackTrans;
+        exit;
+      end;
+    end;
+    CommandText :=
+      'DELETE FROM RESERVA ' +
+      'WHERE TOMBO = ' + IntToStr(Tombo);
+    try
+      Execute;
+    except
+      on E: Exception do
+      begin
+        with Application do
+          MessageBox(PChar(MSG_ERRODELETE + E.Message),
+                     CAP_ERRODB,MB_OKICONSTOP);
+        Screen.Cursor := crDefault;
+        RollBackTrans;
+        exit;
+      end;
+    end;
+    Close;
+    CommandText :=
+      'SELECT T.TEMPOEMPRESTIMO, U.IDUSUARIO ' +
+      'FROM TIPOUSUARIO T, USUARIO U ' +
+      'WHERE T.IDTIPOUSUARIO = U.IDTIPOUSUARIO AND ' +
+      'U.NOME = ' + #39 + Usuario + #39;
+    try
+      RecordSet := Execute;
+    except
+      on E: Exception do
+      begin
+        with Application do
+          MessageBox(PChar(MSG_ERROSELECT + E.Message),
+                     CAP_ERRODB,MB_OKICONSTOP);
+        Screen.Cursor := crDefault;
+        RollBackTrans;
+        exit;
+      end;
+    end;
+    Open;
+    tmpi := FieldByName('TempoEmprestimo').AsInteger;
+    tmpi2 := FieldByName('IdUsuario').AsInteger;
+    Close;
+    CommandText :=
+      'INSERT INTO RETIRADA ' +
+      '(TOMBO,IDUSUARIO,DATAHORARETIRADA,DATAPREVDEVOLUCAO) ' +
+      'VALUES (' + IntToStr(Tombo) + ',' + IntToStr(tmpi2) + ',Now,Now + ' +
+      IntToStr(tmpi) + ')';
+    try
+      Execute;
+    except
+      on E: Exception do
+      begin
+        with Application do
+          MessageBox(PChar(MSG_ERROUPDATE + E.Message),
+                     CAP_ERRODB,MB_OKICONSTOP);
+        Screen.Cursor := crDefault;
+        RollBackTrans;
+        exit;
+      end;
+    end;
+    CommitTrans;
+    Screen.Cursor := crDefault;
+    Result := True;
+  end;
+end;
+
+function TMovData.Devolver(Tombo: Integer): Boolean;
+var IdUsuario: Integer;
+    DataHoraRetirada, DataPrevDevolucao: TDateTime;
+    tmpi, tmpi2: Integer;
+begin
+  with DataModule_Biblio.ADODataSet_MovData,
+       DataModule_Biblio.ADOCommand_MovData do
+  begin
+    UltimoErro := '';
+    Result := False;
+    Close;
+    Screen.Cursor := crSQLWait;
+    BeginTrans;
+    CommandText :=
+      'SELECT DISTINCT U.IDUSUARIO FROM ' +
+      'RETIRADA R, USUARIO U ' +
+      'WHERE R.IDUSUARIO = U.IDUSUARIO AND ' +
+      'R.DATAPREVDEVOLUCAO < NOW';
+    try
+      RecordSet := Execute;
+    except
+      on E: Exception do
+      begin
+        with Application do
+          MessageBox(PChar(MSG_ERROSELECT + E.Message),
+                     CAP_ERRODB,MB_OKICONSTOP);
+        Screen.Cursor := crDefault;
+        exit;
+      end;
+    end;
+    Open;
+    if not IsEmpty then
+    begin
+      {suspende usuario}
+      tmpi := FieldByName('IdUsuario').AsInteger;
+      Close;
+      CommandText :=
+        'SELECT T.TEMPOSUSP ' +
+        'FROM TIPOUSUARIO T, USUARIO U ' +
+        'WHERE T.IDTIPOUSUARIO = U.IDTIPOUSUARIO AND ' +
+        'U.IDUSUARIO = ' + IntToStr(tmpi);
+      try
+        RecordSet := Execute;
+      except
+        on E: Exception do
+        begin
+          with Application do
+            MessageBox(PChar(MSG_ERROSELECT + E.Message),
+                       CAP_ERRODB,MB_OKICONSTOP);
+          Screen.Cursor := crDefault;
+          exit;
+        end;
+      end;
+      Open;
+      tmpi2 := FieldByName('TempoSusp').AsInteger;
+      Close;
+      if tmpi2 > 0 then
+      begin
+        CommandText :=
+          'UPDATE USUARIO ' +
+          'SET SITUACAO = ' + #39 + 'S' + #39 + ' , ' +
+          'DATAEXPIRASUSP = NOW + ' + IntToStr(tmpi2) + ' ' +
+          'WHERE IDUSUARIO = ' + IntToStr(tmpi);
+        try
+          Execute;
+        except
+          on E: Exception do
+          begin
+            with Application do
+              MessageBox(PChar(MSG_ERROUPDATE + E.Message),
+                         CAP_ERRODB,MB_OKICONSTOP);
+            Screen.Cursor := crDefault;
+            exit;
+          end;
+        end;
+      end;
+    end;
+    Close;
+    CommandText :=
+      'SELECT * FROM ' +
+      'RETIRADA ' +
+      'WHERE TOMBO = ' + IntToStr(Tombo);
+    try
+      RecordSet := Execute;
+    except
+      on E: Exception do
+      begin
+        with Application do
+          MessageBox(PChar(MSG_ERROSELECT + E.Message),
+                     CAP_ERRODB,MB_OKICONSTOP);
+        Screen.Cursor := crDefault;
+        RollBackTrans;
+        exit;
+      end;
+    end;
+    Open;
+    if IsEmpty then
+    begin
+      UltimoErro :=
+        'Não foi possível devolver o exemplar, pois ele não está emprestado.';
+      Close;
+      Screen.Cursor := crDefault;
+      RollBackTrans;
+      exit;
+    end;
+    IdUsuario := FieldByName('IdUsuario').AsInteger;
+    DataHoraRetirada := FieldByName('DataHoraRetirada').AsDateTime;
+    DataPrevDevolucao := FieldByName('DataPrevDevolucao').AsDateTime;
+    Close;
+    ShortDateFormat := 'yyyy/mm/dd';
+    CommandText :=
+      'UPDATE ACERVO ' +
+      'SET SITUACAO = ' + #39 + 'D' + #39 + ' ' +
+      'WHERE TOMBO = ' + IntToStr(Tombo);
+    try
+      Execute;
+    except
+      on E: Exception do
+      begin
+        with Application do
+          MessageBox(PChar(MSG_ERROUPDATE + E.Message),
+                     CAP_ERRODB,MB_OKICONSTOP);
+        Screen.Cursor := crDefault;
+        RollBackTrans;
+        exit;
+      end;
+    end;
+    CommandText :=
+      'INSERT INTO DEVOLUCAO ' +
+      '(TOMBO,IDUSUARIO,DATAHORARETIRADA,DATAPREVDEVOLUCAO,DATAHORADEVOLUCAO) ' +
+      'VALUES (' + IntToStr(Tombo) + ',' + IntToStr(IdUsuario) + ',' +
+      #39 + FormatDateTime('yyyy/mm/dd hh:nn:ss',DataHoraRetirada) + #39 + ',' +
+      #39 + DateToStr(DataPrevDevolucao) + #39 + ',' +
+      #39 + FormatDateTime('yyyy/mm/dd hh:nn:ss',Now) + #39 + ')';
+    try
+      Execute;
+    except
+      on E: Exception do
+      begin
+        with Application do
+          MessageBox(PChar(MSG_ERROINSERT + E.Message),
+                     CAP_ERRODB,MB_OKICONSTOP);
+        Screen.Cursor := crDefault;
+        RollBackTrans;
+        ShortDateFormat := 'dd/mm/yyyy';
+        exit;
+      end;
+    end;
+    ShortDateFormat := 'dd/mm/yyyy';
+    CommandText :=
+      'DELETE FROM RETIRADA WHERE TOMBO = ' + IntToStr(Tombo);
+    try
+      Execute;
+    except
+      on E: Exception do
+      begin
+        with Application do
+          MessageBox(PChar(MSG_ERRODELETE + E.Message),
+                     CAP_ERRODB,MB_OKICONSTOP);
+        Screen.Cursor := crDefault;
+        RollBackTrans;
+        exit;
+      end;
+    end;
+    CommitTrans;
+    Screen.Cursor := crDefault;
+    Result := True;
+  end;
+end;
+
+function TMovData.Reservar(Tombo: Integer; Usuario: String): Boolean;
+begin
+  with DataModule_Biblio.ADODataSet_MovData,
+       DataModule_Biblio.ADOCommand_MovData do
+  begin
+    UltimoErro := '';
+    Result := False;
+    Close;
+    Screen.Cursor := crSQLWait;
+    {verifica se já está reservado}
+    CommandText :=
+      'SELECT U.IDUSUARIO FROM ' +
+      'RESERVA R, USUARIO U ' +
+      'WHERE R.IDUSUARIO = U.IDUSUARIO AND ' +
+      'U.NOME = ' + #39 + Usuario + #39 + ' AND ' +
+      'R.TOMBO = ' + IntToStr(Tombo);
+    try
+      RecordSet := Execute;
+    except
+      on E: Exception do
+      begin
+        with Application do
+          MessageBox(PChar(MSG_ERROSELECT + E.Message),
+                     CAP_ERRODB,MB_OKICONSTOP);
+        Screen.Cursor := crDefault;
+        exit;
+      end;
+    end;
+    Open;
+    if not IsEmpty then
+    begin
+      UltimoErro :=
+        'Exemplar já está reservado por esse Usuário.';
+      Close;
+      Screen.Cursor := crDefault;
+      exit;
+    end;
+    Close;
+    CommandText :=
+      'INSERT INTO RESERVA ' +
+      '(IDUSUARIO,TOMBO,DATAHORARESERVA) ' +
+      'SELECT IDUSUARIO, ' + IntToStr(Tombo) + ' AS TOMBO, ' +
+      'NOW AS DATAHORARESERVA ' +
+      'FROM USUARIO WHERE NOME = ' + #39 + Usuario + #39;
+    try
+      Execute;
+    except
+      on E: Exception do
+      begin
+        with Application do
+          MessageBox(PChar(MSG_ERROINSERT + E.Message),
+                     CAP_ERRODB,MB_OKICONSTOP);
+        Screen.Cursor := crDefault;
+        exit;
+      end;
+    end;
+    Screen.Cursor := crDefault;
+    Result := True;
+  end;
+end;
+
+function TMovData.MoverPerdido(Tombo: Integer; Usuario: String;
+                               Coloca: Boolean = True): Boolean;
+begin
+  with DataModule_Biblio.ADODataSet_MovData,
+       DataModule_Biblio.ADOCommand_MovData do
+  begin
+    UltimoErro := '';
+    Result := False;
+    Close;
+    Screen.Cursor := crSQLWait;
+    if not Coloca then
+    begin
+      {retira do acervo perdido}
+      BeginTrans;
+      if not Devolver(Tombo) then
+      begin
+        Screen.Cursor := crDefault;
+        RollBackTrans;
+        exit;
+      end;
+      CommandText :=
+        'DELETE FROM ACERVOPERDIDO ' +
+        'WHERE ' +
+        'TOMBO = ' + IntToStr(Tombo);
+      try
+        Execute;
+      except
+        on E: Exception do
+        begin
+          with Application do
+            MessageBox(PChar(MSG_ERRODELETE + E.Message),
+                       CAP_ERRODB,MB_OKICONSTOP);
+          Screen.Cursor := crDefault;
+          RollBackTrans;
+          exit;
+        end;
+      end;
+      CommandText :=
+        'UPDATE ACERVO ' +
+        'SET SITUACAO = ' + #39 + 'D' + #39 + ' ' +
+        'WHERE TOMBO = ' + IntToStr(Tombo);
+      try
+        Execute;
+      except
+        on E: Exception do
+        begin
+          with Application do
+            MessageBox(PChar(MSG_ERROUPDATE + E.Message),
+                       CAP_ERRODB,MB_OKICONSTOP);
+          Screen.Cursor := crDefault;
+          RollBackTrans;
+          exit;
+        end;
+      end;
+      CommitTrans;
+      Screen.Cursor := crDefault;
+      Result := True;
+      exit;
+    end;
+    {verifica se já está perdido}
+    CommandText :=
+      'SELECT TOMBO FROM ' +
+      'ACERVOPERDIDO ' +
+      'WHERE ' +
+      'TOMBO = ' + IntToStr(Tombo);
+    try
+      RecordSet := Execute;
+    except
+      on E: Exception do
+      begin
+        with Application do
+          MessageBox(PChar(MSG_ERROSELECT + E.Message),
+                     CAP_ERRODB,MB_OKICONSTOP);
+        Screen.Cursor := crDefault;
+        exit;
+      end;
+    end;
+    Open;
+    if not IsEmpty then
+    begin
+      UltimoErro :=
+        'Exemplar já está no "Acervo Perdido".';
+      Close;
+      Screen.Cursor := crDefault;
+      exit;
+    end;
+    Close;
+    BeginTrans;
+    CommandText :=
+      'INSERT INTO ACERVOPERDIDO ' +
+      '(IDUSUARIO,TOMBO,DATAHORAPERDA) ' +
+      'SELECT IDUSUARIO, ' + IntToStr(Tombo) + ' AS TOMBO, ' +
+      'NOW AS DATAHORAPERDA ' +
+      'FROM USUARIO WHERE NOME = ' + #39 + Usuario + #39;
+    try
+      Execute;
+    except
+      on E: Exception do
+      begin
+        with Application do
+          MessageBox(PChar(MSG_ERROINSERT + E.Message),
+                     CAP_ERRODB,MB_OKICONSTOP);
+        Screen.Cursor := crDefault;
+        RollBackTrans;
+        exit;
+      end;
+    end;
+    CommandText :=
+      'UPDATE ACERVO ' +
+      'SET SITUACAO = ' + #39 + 'P' + #39 + ' ' +
+      'WHERE TOMBO = ' + IntToStr(Tombo);
+    try
+      Execute;
+    except
+      on E: Exception do
+      begin
+        with Application do
+          MessageBox(PChar(MSG_ERROUPDATE + E.Message),
+                     CAP_ERRODB,MB_OKICONSTOP);
+        Screen.Cursor := crDefault;
+        RollBackTrans;
+        exit;
+      end;
+    end;
+    CommitTrans;
+    Screen.Cursor := crDefault;
+    Result := True;
+  end;
+end;
+
+function TMovData.GetDataPrevDev(Tombo: Integer): String;
+begin
+  with DataModule_Biblio.ADODataSet_MovData,
+       DataModule_Biblio.ADOCommand_MovData do
+  begin
+    Result := '-';
+    Close;
+    CommandText :=
+      'SELECT DATAPREVDEVOLUCAO FROM ' +
+      'RETIRADA ' +
+      'WHERE ' +
+      'TOMBO = ' + IntToStr(Tombo);
+    try
+      RecordSet := Execute;
+    except
+      on E: Exception do
+      begin
+        with Application do
+          MessageBox(PChar(MSG_ERROSELECT + E.Message),
+                     CAP_ERRODB,MB_OKICONSTOP);
+        exit;
+      end;
+    end;
+    Open;
+    if not IsEmpty then
+    begin
+      Result := FormatDateTime('dd/mm/yyyy',
+                FieldByName('DataPrevDevolucao').AsDateTime);
+    end;
+    Close;
+  end;
+end;
+
+procedure TMovData.GetUsuarioAPerdido(Tombo: Integer;
+                                     var Usuario: String; var RGA: String);
+begin
+  with DataModule_Biblio.ADODataSet_MovData,
+       DataModule_Biblio.ADOCommand_MovData do
+  begin
+    Close;
+    CommandText :=
+      'SELECT U.NOME, U.RGA FROM ' +
+      'USUARIO U, RETIRADA R ' +
+      'WHERE ' +
+      'R.TOMBO = ' + IntToStr(Tombo) + ' AND ' +
+      'R.IDUSUARIO = U.IDUSUARIO';
+    try
+      RecordSet := Execute;
+    except
+      on E: Exception do
+      begin
+        with Application do
+          MessageBox(PChar(MSG_ERROSELECT + E.Message),
+                     CAP_ERRODB,MB_OKICONSTOP);
+        exit;
+      end;
+    end;
+    Open;
+    Usuario := '';
+    RGA := '';
+    if not IsEmpty then
+    begin
+      Usuario := FieldByName('Nome').AsString;
+      RGA := FieldByName('RGA').AsString;
+    end;
+    Close;
+  end;
+end;
+
+procedure TMovData.LiberaUsuario;
+begin
+  with DataModule_Biblio.ADODataSet_MovData,
+       DataModule_Biblio.ADOCommand_MovData do
+  begin
+    Close;
+    CommandText :=
+      'UPDATE USUARIO ' +
+      'SET SITUACAO = ' + #39 + 'N' + #39 + ' ' +
+      'WHERE ' +
+      'DATAEXPIRASUSP <= NOW';
+    try
+      Execute;
+    except
+      on E: Exception do
+      begin
+        with Application do
+          MessageBox(PChar(MSG_ERROUPDATE + E.Message),
+                     CAP_ERRODB,MB_OKICONSTOP);
+        exit;
+      end;
+    end;
+  end;
+end;
+
 {-------------------- TDataModule_Biblio -----------------------}
 
 procedure TDataModule_Biblio.DataModuleCreate(Sender: TObject);
@@ -5610,6 +7537,7 @@ var Path: String;
     FTipoAcervos: TTipoAcervos;
     FAreaAcervos: TAreaAcervos;
     FClassificacaoAcervos: TClassificacaoAcervos;
+    FMovData: TMovData;
     id: Integer;
 begin
   id := 1;
@@ -5620,7 +7548,7 @@ begin
     with Application do
     begin
       MessageBox(MSG_SEMDB,CAP_SEMDB,MB_OKICONSTOP);
-      Terminate;
+      Halt(1);
     end;
   end;
   {Faz a conexão ao Banco de Dados}
@@ -5646,7 +7574,7 @@ begin
       begin
         Screen.Cursor := crDefault;
         MessageBox(PChar(MSG_NOCONNDB + E.Message),CAP_NOCONNDB,MB_OKICONSTOP);
-        Terminate;
+        Halt(1);
       end;
     end;
   end;
@@ -5904,6 +7832,9 @@ begin
     end;
     Free;
   end;
+  FMovData := TMovData.Create;
+  FMovData.LiberaUsuario;
+  FMovData.Free;
   Screen.Cursor := crDefault;
 end;
 

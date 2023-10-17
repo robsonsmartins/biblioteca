@@ -46,7 +46,7 @@ PackageDCPOutputDir=
 SearchPath=F:\Meus documentos\Projeto Biblioteca\Componentes;E:\Robson\BBtca\Comps;E:\Robson\BBtca\Comps\ZLib
 Packages=VCL50;VCLX50;VCLSMP50;VCLDB50;VCLADO50;ibevnt50;VCLBDE50;VCLDBX50;QRPT50;TEEUI50;TEEDB50;TEE50;DSS50;TEEQR50;VCLIB50;VCLMID50;VCLIE50;INETDB50;INET50;NMFAST50;WEBMID50;dclocx50;dclaxserver50
 Conditionals=
-DebugSourceDirs=F:\Meus documentos\Projeto Biblioteca\Componentes\
+DebugSourceDirs=F:\Meus documentos\Projeto Biblioteca\Componentes\;C:\Pastas Rafael\Faculdade Batista\Projeto Biblioteca\Engenharia de Software II\Projeto\Beta_v0_3_Source\Comps\
 UsePackages=0
 [Parameters]
 RunParams=
@@ -54,12 +54,12 @@ HostApplication=
 [Version Info]
 IncludeVerInfo=1
 AutoIncBuild=0
-MajorVer=0
-MinorVer=3
+MajorVer=1
+MinorVer=0
 Release=0
 Build=0
 Debug=0
-PreRelease=1
+PreRelease=0
 Special=0
 Private=0
 DLL=0
@@ -68,7 +68,7 @@ CodePage=1252
 [Version Info Keys]
 CompanyName=FBAI (Grupo Biblioteca)
 FileDescription=Sistema Biblioteca
-FileVersion=0.3.0.0
+FileVersion=1.0.0.0
 InternalName=biblioteca.exe
 LegalCopyright=FBAI (Grupo Biblioteca)
 LegalTrademarks=Faculdades Batista de Administração e Informática
@@ -81,9 +81,10 @@ Grupo Biblioteca=Alberto, Granhan Bell, Rafael, Robson, Rute e Sandra
 C:\ARQUIV~1\Borland\Delphi5\Projects\Bpl\S303_R50.bpl=SysTools 3 Runtime Package
 C:\ARQUIV~1\Borland\Delphi5\Projects\Bpl\S303BR50.bpl=SysTools 3 DB Runtime Package
 [HistoryLists\hlDebugSourcePath]
-Count=2
-Item0=F:\Meus documentos\Projeto Biblioteca\Componentes\
-Item1=d:\robson\sistema bbt\comps
+Count=3
+Item0=F:\Meus documentos\Projeto Biblioteca\Componentes\;C:\Pastas Rafael\Faculdade Batista\Projeto Biblioteca\Engenharia de Software II\Projeto\Beta_v0_3_Source\Comps\
+Item1=F:\Meus documentos\Projeto Biblioteca\Componentes\
+Item2=d:\robson\sistema bbt\comps
 [HistoryLists\hlUnitAliases]
 Count=1
 Item0=WinTypes=Windows;WinProcs=Windows;DbiTypes=BDE;DbiProcs=BDE;DbiErrs=BDE;

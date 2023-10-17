@@ -124,6 +124,8 @@ type
     Panel_Exemplares: TPanel;
     Label_Exemplares: TLabel;
     ListView_Exemplares: TListView;
+    Label_UltimoTombo: TLabel;
+    inf_Tombo: TLabel;
     {Tratadores de Evento}
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
@@ -208,6 +210,7 @@ begin
     Edit_DeEtaria.Text := Copy(FaixaEtaria,1,2);
     Edit_AteEtaria.Text := Copy(FaixaEtaria,3,2);
     Edit_Localizacao.Text := Localizacao;
+    inf_Tombo.Caption := IntToStr(MaxTombo);
     with TipoAcervo do
     begin
       with ComboBox_TipoAcervo do
@@ -536,6 +539,7 @@ procedure Tform_CadastroAcervo.FormCreate(Sender: TObject);
 begin
   {Evento OnCreate do Form}
   {Cria o objeto da classe de Interface}
+  inf_Tombo.Caption := '';
   DataInterface := TDataInterface.Create;
   DataInterface.ReadTipos(Self);
   ComboBox_TipoAcervo.ItemIndex := 0;
@@ -717,7 +721,8 @@ begin
 end;
 
 procedure Tform_CadastroAcervo.ExecutaRecord(Operacao: String);
-var i, id: Integer;
+var i, j, id: Integer;
+    Tem: Boolean;
 begin
   {Executa operações com os registros}
   {Insert}
@@ -778,7 +783,63 @@ begin
       if ConsisteDados(Self) then
       begin
         FDataClass.GetExemplares(Exemplares);
-        {apaga todos}
+
+        FDataClass.BeginTrans;
+        for i := 0 to Length(Exemplares) - 1 do
+        begin
+          with ListView_Exemplares, Exemplares[i] do
+          begin
+            if FDataClass.InTransaction then
+            begin
+              if FindCaption(0,IntToStr(Tombo),False,True,False) = nil then
+              begin
+                FDataClass.State := stRead;
+                FDataClass.Registro.Tombo := Tombo;
+                FDataClass.Delete;
+              end;
+            end
+            else
+              break;
+          end;
+        end;
+        {faz insert / update}
+        with ListView_Exemplares do
+        begin
+          for i := 0 to Items.Count - 1  do
+          begin
+            if FDataClass.InTransaction then
+            begin
+              Tem := False;
+              for j := 0 to Length(Exemplares) - 1 do
+              begin
+                if Exemplares[j].Tombo = StrToInt(Items.Item[i].Caption) then
+                begin
+                  Tem := True;
+                  break;
+                end;
+              end;
+              if not Tem then
+              begin
+                Post(Self);
+                FDataClass.State := stInsert;
+                FDataClass.Registro.Tombo := StrToInt(Items.Item[i].Caption);
+                FDataClass.Registro.Situacao :=
+                  StrToSituacao(Items.Item[i].SubItems.Strings[0]);
+                FDataClass.Post;
+              end
+              else
+              begin
+                Post(Self);
+                FDataClass.State := stEdit;
+                FDataClass.Registro.Tombo := StrToInt(Items.Item[i].Caption);
+                FDataClass.Post;
+              end;
+            end
+            else
+              break;
+          end;
+        end;
+(*        {apaga todos}
         FDataClass.BeginTrans;
         for i := 0 to Length(Exemplares) - 1 do
         begin
@@ -811,7 +872,7 @@ begin
             else
               break;
           end;
-        end;
+        end; *)
         FDataClass.CommitTrans;
         id := FDataClass.Registro.Tombo;
         FDataClass.Refresh;
