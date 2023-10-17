@@ -34,13 +34,23 @@ uses
   unit_BackupDialog in 'unit_BackupDialog.pas' {form_BackupBDDialog},
   unit_RestoreDialog in 'unit_RestoreDialog.pas' {form_RestoreBDDialog},
   unit_SplashForm in 'unit_SplashForm.pas' {form_Splash},
+  relatorio_usuario in 'relatorio_usuario.pas' {form_RelatorioUsuario},
+  relatorio_acervoperdido in 'relatorio_acervoperdido.pas' {form_RelatorioAcervoPerdido},
+  relatorio_fornecedor in 'relatorio_fornecedor.pas' {form_RelatorioFornecedor},
+  relatorio_reserva in 'relatorio_reserva.pas' {form_RelatorioReserva},
+  relatorio_retirada in 'relatorio_retirada.pas' {form_RelatorioRetirada},
+  relatorio_acervo in 'relatorio_acervo.pas' {form_RelatorioAcervo},
+  relatorio_DevUsuario in 'relatorio_DevUsuario.pas' {form_RelatorioDevUsuario},
+  relatorio_DevAcervo in 'relatorio_DevAcervo.pas' {form_RelatorioDevAcervo},
+  relatorio_AcervoRet in 'relatorio_AcervoRet.pas' {form_RelatorioAcervoRet},
+  relatorio_UsuSusp in 'relatorio_UsuSusp.pas' {form_RelatorioUsuSusp},
   ZLibEx in '..\Componentes\ZLib\ZLibEx.pas';
 
 {$R *.RES}
 begin
   {Só executa a Aplicação se não há outra instância rodando}
-//  if not SystemRunning then
-//  begin
+  if not SystemRunning then
+  begin
     if not MinRes800x600 then
       Application.MessageBox(MSG_MINRES,CAP_MINRES,MB_OKICONSTOP)
     else
@@ -60,5 +70,5 @@ begin
       end;
       Application.Run;
     end;
-//  end;
+  end;
 end.

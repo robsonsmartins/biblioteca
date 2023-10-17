@@ -6,7 +6,7 @@
 
   Tela Principal do Sistema Biblioteca - Desktop.
 
-  Data última revisão: 05/11/2001
+  Data última revisão: 12/12/2001
 
 *****************************************************************************}
 
@@ -45,6 +45,7 @@ type
     mi_BancoDadosBackup: TMenuItem;
     mi_BancoDadosRestore: TMenuItem;
     Timer_Login: TTimer;
+    TreeList: TTreeView;
     procedure FormCreate(Sender: TObject);
     procedure DesktopLaunch_DesktopCommand(Command: String;
       Sender: TObject);
@@ -62,6 +63,7 @@ type
     { Public declarations }
     Direitos: TDireitos;
     Conta: TContaLogin;
+    AcervoArray: Array of TAcervoArray;
   end;
 
 var
@@ -90,13 +92,18 @@ begin
     Add('Cadastro de Usuários',form_CadastroUsuarios,Tform_CadastroUsuarios);
     Add('Cadastro de Fornecedores',form_CadastroFornecedores,
         Tform_CadastroFornecedores);
-    Add('Relatórios da Biblioteca',form_EscolhaRelatorios,Tform_EscolhaRelatorios);
     Add('Painel de Controle',form_PainelDeControle,Tform_PainelDeControle);
   end;
   {aplica configs}
   form_AparenciaDialog := Tform_AparenciaDialog.Create(Self);
   form_AparenciaDialog.Aplicar(Desktop_Desktop);
   FreeAndNil(form_AparenciaDialog);
+  {carrega configs do Explorer}
+  SetLength(AcervoArray,0);
+  form_BibliotecaExplorer := Tform_BibliotecaExplorer.Create(Self);
+  form_BibliotecaExplorer.DataInterface.Read(form_BibliotecaExplorer);
+  TreeList.Items.Assign(form_BibliotecaExplorer.TreeView_Classes.Items);
+  FreeAndNil(form_BibliotecaExplorer);
 end;
 
 procedure Tform_Desktop.ExecutaComando(Command: String);
@@ -173,6 +180,13 @@ begin
       FreeAndNil(form_RestoreBDDialog);
       DataModule_Biblio.ADOConnection_Biblio.Open;
     end;
+  end
+  else if Trim(UpCommand) = 'RELATóRIOS DA BIBLIOTECA' then
+  begin
+    form_EscolhaRelatorios := Tform_EscolhaRelatorios.Create(Self);
+    form_EscolhaRelatorios.FormStyle := fsNormal;
+    form_EscolhaRelatorios.ShowModal;
+    FreeAndNil(form_EscolhaRelatorios);
   end;
 end;
 
@@ -261,10 +275,10 @@ end;
 
 procedure Tform_Desktop.FormCreate(Sender: TObject);
 begin
-  Inicializar;
-  BBStatusBar_Status.Active := False;
   Direitos := TDireitos.Create;
   Conta := TContaLogin.Create;
+  Inicializar;
+  BBStatusBar_Status.Active := False;
   FAutoLogoff := False;
   {faz o login}
   Timer_Login.Enabled := True;
@@ -296,9 +310,19 @@ begin
 end;
 
 procedure Tform_Desktop.FormDestroy(Sender: TObject);
+var i,j: Integer;
 begin
   Direitos.Free;
   Conta.Free;
+  for i := 0 to Length(AcervoArray) - 1 do
+  begin
+    for j := 0 to Length(AcervoArray[i]) - 1 do
+    begin
+      AcervoArray[i][j].Free;
+    end;
+    SetLength(AcervoArray[i],0);
+  end;
+  SetLength(AcervoArray,0);
 end;
 
 procedure Tform_Desktop.BBStatusBar_StatusTimeOut;

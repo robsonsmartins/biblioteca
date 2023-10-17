@@ -129,6 +129,11 @@ const
     'Tente procurar outro arquivo.';
   CAP_PICPEQ =
     'Imagem muito pequena';
+  MSG_EXEMPRESERVADO =
+    'Este exemplar do acervo já está reservado para os seguintes usuários:' +
+    #13#10;
+  MSG_EXEMPRESERVADO1 =
+    'Confirma mesmo assim o empréstimo ?';
   {constantes usadas pelo backup/restore}
   CAP_ERROBAKALL =
     'Erro na criação da Cópia de Segurança';
