@@ -1,8 +1,14 @@
+{******************************************************************************
 
-// para fazer:
-{
-- Colocar o TIdleTimer nesta unit.(implementar um componente para fezer o login)
-}
+  SISTEMA BIBLIOTECA - FBAI 2001
+
+  InterfaceComponentes.pas
+
+  Contém as classes relativas aos Componentes de Interface (Visuais)
+
+  Data última revisão: 22/11/2001
+
+******************************************************************************}
 
 unit InterfaceComponentes;
 
@@ -22,6 +28,8 @@ type
 {evento OnPopupCommand}
   TPopupCommandEvent = procedure(Command: String; PopupCommand: String;
                                  Sender: TObject) of object;
+{evento OnTimeOut}
+  TIdleCountEvent = procedure of object;
 
 {---------------------------- TTaskBar ---------------------------------------}
 
@@ -330,6 +338,43 @@ type
 
 {---------------------------- TBBStatusBar -----------------------------------}
 
+type TIdleCount = class
+  private
+    { Private declarations }
+    Timer: TTimer;
+    FInterval: TDateTime;
+    FOnIdle: TIdleCountEvent;
+    FStartedAt: TDateTime;
+    FActive: Boolean;
+    FEnabled: Boolean;
+    FMsgEvent: TMessageEvent;
+    FUltimaMsg: DWord;
+    {métodos para atribuição de propriedades}
+    function GetInterval: String;
+    procedure SetInterval(Value: String);
+    procedure SetActive(Value: Boolean);
+    procedure SetEnabled(Value: Boolean);
+    {métodos manipuladores de eventos internos}
+    procedure TimerEvent(Sender: TObject);
+    procedure MessageEvent(var Msg: tagMSG; var Handled: Boolean);
+  public
+    { Public declarations }
+    {eventos}
+    property OnIdle: TIdleCountEvent read FOnIdle write FOnIdle;
+    {propriedades não visuais}
+    property Interval: TDateTime read FInterval write FInterval;
+    property IntervalAsString: String read GetInterval write SetInterval;
+    property StartedAt: TDateTime read FStartedAt;
+    property Active: Boolean read FActive write SetActive;
+    property Enabled: Boolean read FEnabled write SetEnabled;
+    {constructors e destructors}
+    constructor Create;
+    destructor Destroy; override;
+    {métodos}
+    procedure Start(SetInterval: TDateTime = 0);
+    procedure Stop;
+end;
+
 type
   TBBStatusBar = class(TStatusBar)
   private
@@ -340,12 +385,19 @@ type
     FActive: Boolean;
     FOldHint: TNotifyEvent;
     FUsuario: String;
+    FIdleCount: TIdleCount;
+    FOnTimeOut: TIdleCountEvent;
     {métodos para atribuição de propriedades}
     procedure SetActive(Value: Boolean);
+    procedure SetIdleTimer(Value: Boolean);
+    function GetIdleTimer: Boolean;
+    procedure SetIdleInterval(Value: TDateTime);
+    function GetIdleInterval: TDateTime;
     {métodos manipuladores de eventos internos}
     procedure ApplicationHint(Sender: TObject);
     procedure TimerTimer(Sender: TObject);
     procedure BBStatusBarResize(Sender: TObject);
+    procedure IdleCountIdle;
   protected
     { Protected declarations }
   public
@@ -355,12 +407,15 @@ type
     {constructors e destructors}
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
-    {métodos}
   published
     { Published declarations }
     {propriedades visuais}
     property Active: Boolean read FActive write SetActive;
     property Usuario: String read FUsuario write FUsuario;
+    property IdleTimer: Boolean read GetIdleTimer write SetIdleTimer;
+    property IdleInterval: TDateTime read GetIdleInterval write SetIdleInterval;
+    {eventos}
+    property OnTimeOut: TIdleCountEvent read FOnTimeOut write FOnTimeOut;
   end;
 
 {---------------------------- TDesktopLaunch ---------------------------------}
@@ -1466,7 +1521,7 @@ var i: Integer;
 begin
   {apaga todos os ícones do desktop}
   for i := 0 to Length(FIcones) - 1 do
-    FIcones[i].Free;
+    FreeAndNil(FIcones[i]);
   SetLength(FIcones,0);
 end;
 
@@ -1703,6 +1758,115 @@ begin
   SetLength(FFormItem,Length(FFormItem) - 1);
 end;
 
+{---------------------------- TIdleCount -----------------------------------}
+
+constructor TIdleCount.Create;
+begin
+  {cria o objeto}
+  inherited Create;
+  Timer := TTimer.Create(Application);
+  Timer.Enabled := False;
+  Timer.Interval := 1000;
+  IntervalAsString := '00:15:00'; //default 15 minutos
+  FActive := False;
+  FStartedAt := Time;
+  Timer.OnTimer := TimerEvent;
+  FEnabled := False;
+  FUltimaMsg := 0;
+end;
+
+destructor TIdleCount.Destroy;
+begin
+  {destroi objeto}
+  Stop;
+  inherited Destroy;
+end;
+
+function TIdleCount.GetInterval: String;
+begin
+  {retorna o intervalo}
+  GetInterval := TimeToStr(FInterval);
+end;
+
+procedure TIdleCount.SetInterval(Value: String);
+begin
+  {seta o intervalo}
+  FInterval := StrToTime(Value);
+end;
+
+procedure TIdleCount.SetActive(Value: Boolean);
+begin
+  {ativa o TIdleCount}
+  if Value = FActive then
+    exit;
+  if Value = True then
+    Start
+  else
+    Stop;
+end;
+
+procedure TIdleCount.SetEnabled(Value: Boolean);
+begin
+  {Habilita}
+  FEnabled := Value;
+  if not Value then
+    Stop;
+end;
+
+procedure TIdleCount.TimerEvent(Sender: TObject);
+begin
+  {evento do Timer}
+  if Time - FStartedAt >= FInterval then
+  begin
+    FStartedAt := Time;
+    {dispara evento OnIdle}
+    OnIdle;
+  end;
+end;
+
+procedure TIdleCount.MessageEvent(var Msg: tagMSG; var Handled: Boolean);
+begin
+  {evento OnMessage do Application}
+  if ((Msg.message = WM_MOUSEMOVE) and (GetMessagePos <> FUltimaMsg)) or
+     (Msg.message = WM_KEYDOWN) or (not Application.Active) then
+  begin
+    FStartedAt := Time;
+    FUltimaMsg := GetMessagePos;
+  end;
+  if Assigned(FMsgEvent) then
+    FMsgEvent(Msg,Handled);
+end;
+
+procedure TIdleCount.Start(SetInterval: TDateTime = 0);
+begin
+  {inicia o Timer}
+  if Assigned(Application.OnMessage) then
+    FMsgEvent := Application.OnMessage;
+  if not FEnabled then
+    exit;
+  Application.OnMessage := MessageEvent;
+  if SetInterval = 0 then
+  begin
+    if FInterval = 0 then
+      IntervalAsString := '00:15:00'; //default 15 minutos
+  end
+  else
+    FInterval := SetInterval;
+  FActive := True;
+  FStartedAt := Time;
+  Timer.Enabled := True;
+end;
+
+procedure TIdleCount.Stop;
+begin
+  {pára o Timer}
+  if Assigned(FMsgEvent) then
+    Application.OnMessage := FMsgEvent
+  else
+    Application.OnMessage := nil;
+  FActive := False;
+  Timer.Enabled := False;
+end;
 
 {---------------------------- TBBStatusBar -----------------------------------}
 
@@ -1720,6 +1884,11 @@ begin
     Interval := 500;
     OnTimer := TimerTimer;
   end;
+  {cria o IdleCount}
+  FIdleCount := TIdleCount.Create;
+  FIdleCount.OnIdle := IdleCountIdle;
+  FIdleCount.Start;
+  FIdleCount.Stop;
   FActive := False;
   FStart := 0;
   FCount := 0;
@@ -1762,6 +1931,7 @@ destructor TBBStatusBar.Destroy;
 begin
   {destrói o TTimer}
   FTimer.Free;
+  FreeAndNil(FIdleCount);
   Application.OnHint := nil;
   {executa método destroy de TStatusBar}
   inherited Destroy;
@@ -1773,6 +1943,8 @@ procedure TBBStatusBar.SetActive(Value: Boolean);
 begin
   {altera a propriedade Active}
   FActive := Value;
+  if FIdleCount.Enabled then
+    FIdleCount.Active := Value;
   {se ativado, zera e liga o timer}
   if FActive then
   begin
@@ -1798,6 +1970,30 @@ begin
       Panels[3].Text := FormatDateTime('dd/mm/yyyy',Date);
     end;
   end;
+end;
+
+procedure TBBStatusBar.SetIdleTimer(Value: Boolean);
+begin
+  {altera a propriedade Enabled do IdleCount}
+  FIdleCount.Enabled := Value;
+end;
+
+function TBBStatusBar.GetIdleTimer: Boolean;
+begin
+  {lê a propriedade Enabled do IdleCount}
+  Result := FIdleCount.Enabled;
+end;
+
+procedure TBBStatusBar.SetIdleInterval(Value: TDateTime);
+begin
+  {altera a propriedade Interval do IdleCount}
+  FIdleCount.Interval := Value;
+end;
+
+function TBBStatusBar.GetIdleInterval: TDateTime;
+begin
+  {lê a propriedade Interval do IdleCount}
+  Result := FIdleCount.Interval;
 end;
 
 {.................Manipuladores de Eventos Internos...........................}
@@ -1833,6 +2029,13 @@ begin
   {redimensiona os painéis}
   if Panels.Count > 0 then
     Panels[0].Width := Self.Width - 410;
+end;
+
+procedure TBBStatusBar.IdleCountIdle;
+begin
+  {dispara evento OnTimeOut}
+  if Assigned(FOnTimeOut) then
+    FOnTimeOut;
 end;
 
 {---------------------------- TDesktopLaunch ---------------------------------}

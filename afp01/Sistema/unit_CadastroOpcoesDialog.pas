@@ -241,7 +241,6 @@ type
     IntTipoAcervos: TIntTipoAcervos;
     IntAreaAcervos: TIntAreaAcervos;
     IntClassificacaoAcervos: TIntClassificacaoAcervos;
-//    procedure ExecutaRecord(Operacao, Cadastro: String);
   public
     { Public declarations }
     procedure ExecutaRecord(Operacao, Cadastro: String);

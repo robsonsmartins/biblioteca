@@ -30,17 +30,25 @@ uses
   unit_RetiradaDialog in 'unit_RetiradaDialog.pas' {form_RetiradaDialog},
   unit_Comum in 'unit_Comum.pas',
   unit_DatabaseClasses in 'unit_DatabaseClasses.pas' {DataModule_Biblio: TDataModule},
-  unit_PesquisaDialog in 'unit_PesquisaDialog.pas' {form_PesquisaDialog};
+  unit_PesquisaDialog in 'unit_PesquisaDialog.pas' {form_PesquisaDialog},
+  unit_BackupDialog in 'unit_BackupDialog.pas' {form_BackupBDDialog},
+  unit_RestoreDialog in 'unit_RestoreDialog.pas' {form_RestoreBDDialog},
+  ZLibEx in '..\Componentes\ZLib\ZLibEx.pas';
 
 {$R *.RES}
 begin
   {Só executa a Aplicação se não há outra instância rodando}
-  if not SystemRunning then
-  begin
-    Application.Initialize;
-    Application.Title := 'Sistema Biblioteca';
-    Application.CreateForm(TDataModule_Biblio, DataModule_Biblio);
-    Application.CreateForm(Tform_Desktop, form_Desktop);
-    Application.Run;
-  end;
+//  if not SystemRunning then
+//  begin
+    if not MinRes800x600 then
+      Application.MessageBox(MSG_MINRES,CAP_MINRES,MB_OKICONSTOP)
+    else
+    begin
+      Application.Initialize;
+      Application.Title := 'Sistema Biblioteca';
+      Application.CreateForm(TDataModule_Biblio, DataModule_Biblio);
+      Application.CreateForm(Tform_Desktop, form_Desktop);
+      Application.Run;
+    end;
+//  end;
 end.

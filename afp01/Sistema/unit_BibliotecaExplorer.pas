@@ -8,27 +8,22 @@ uses
 
 type
   Tform_BibliotecaExplorer = class(TForm)
-    MainMenu1: TMainMenu;
-    Acervo1: TMenuItem;
-    Emprestar1: TMenuItem;
-    Devolver1: TMenuItem;
-    Reservar1: TMenuItem;
-    MoverparaAcervoPerdido1: TMenuItem;
-    Localizar1: TMenuItem;
-    Acervo2: TMenuItem;
-    Explorer1: TMenuItem;
-    Fechar1: TMenuItem;
-    ToolBar1: TToolBar;
     ImageList1: TImageList;
-    ToolButton1: TToolButton;
-    ToolButton2: TToolButton;
     TreeView1: TTreeView;
     Splitter1: TSplitter;
     StatusBar1: TStatusBar;
     ListView1: TListView;
     Splitter2: TSplitter;
     ListView2: TListView;
-    ToolButton3: TToolButton;
+    ToolBar_Principal: TToolBar;
+    ToolButton_Primeiro: TToolButton;
+    ToolButton_Anterior: TToolButton;
+    ToolButton_Proximo: TToolButton;
+    ToolButton_Ultimo: TToolButton;
+    ToolButton_Separator1: TToolButton;
+    ToolButton_Pesquisar: TToolButton;
+    ToolButton1: TToolButton;
+    ToolButton2: TToolButton;
     procedure Emprestar1Click(Sender: TObject);
     procedure Reservar1Click(Sender: TObject);
     procedure MoverparaAcervoPerdido1Click(Sender: TObject);

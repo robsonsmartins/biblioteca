@@ -107,4 +107,52 @@ object DataModule_Biblio: TDataModule_Biblio
     Left = 216
     Top = 160
   end
+  object ADODataSet_GrupoLogins: TADODataSet
+    Connection = ADOConnection_Biblio
+    ParamCheck = False
+    Parameters = <>
+    Prepared = True
+    Left = 60
+    Top = 312
+  end
+  object ADOCommand_GrupoLogins: TADOCommand
+    CommandTimeout = 300
+    Connection = ADOConnection_Biblio
+    Parameters = <>
+    ParamCheck = False
+    Left = 60
+    Top = 264
+  end
+  object ADOCommand_ContaLogins: TADOCommand
+    CommandTimeout = 300
+    Connection = ADOConnection_Biblio
+    Parameters = <>
+    ParamCheck = False
+    Left = 208
+    Top = 264
+  end
+  object ADODataSet_ContaLogins: TADODataSet
+    Connection = ADOConnection_Biblio
+    ParamCheck = False
+    Parameters = <>
+    Prepared = True
+    Left = 208
+    Top = 312
+  end
+  object ADOCommand_RegLogin: TADOCommand
+    CommandTimeout = 300
+    Connection = ADOConnection_Biblio
+    Parameters = <>
+    ParamCheck = False
+    Left = 376
+    Top = 264
+  end
+  object ADODataSet_RegLogin: TADODataSet
+    Connection = ADOConnection_Biblio
+    ParamCheck = False
+    Parameters = <>
+    Prepared = True
+    Left = 372
+    Top = 316
+  end
 end

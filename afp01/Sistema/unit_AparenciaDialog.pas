@@ -29,6 +29,8 @@ type
       IconBackColor: TColor;
       DesktopColor: TColor;
       WallPaperName: String;
+      NTentativas: Integer; {0 - infinito}
+      AutoLogoff: Integer; {0 - desabilitado}
       {construtor}
       constructor Create;
       {métodos}
@@ -99,6 +101,8 @@ var
 
 implementation
 
+uses unit_Comum;
+
 {$R *.DFM}
 
 {-------------------- TConfiguracao -----------------------}
@@ -111,6 +115,8 @@ begin
   IconBackColor := clNavy;
   DesktopColor := clNavy;
   WallPaperName := ExtractFilePath(Application.ExeName) + 'default.bmp';
+  NTentativas := 3;
+  AutoLogoff := 15;
   Read(True);
 end;
 
@@ -142,12 +148,18 @@ begin
           WriteInteger('DesktopColor',DesktopColor);
         if not ValueExists('WallPaperName') then
           WriteString('WallPaperName',WallPaperName);
+        if not ValueExists('NTentativas') then
+          WriteInteger('NTentativas',NTentativas);
+        if not ValueExists('AutoLogoff') then
+          WriteInteger('AutoLogoff',AutoLogoff);
       end;
       {lê config. do registro}
       IconTextColor := ReadInteger('IconTextColor');
       IconBackColor := ReadInteger('IconBackColor');
       DesktopColor := ReadInteger('DesktopColor');
       WallPaperName := ReadString('WallPaperName');
+      NTentativas := ReadInteger('NTentativas');
+      AutoLogoff := ReadInteger('AutoLogoff');
       if not FileExists(WallPaperName) then
         WallPaperName := '';
     except
@@ -181,6 +193,8 @@ begin
       WriteInteger('IconBackColor',IconBackColor);
       WriteInteger('DesktopColor',DesktopColor);
       WriteString('WallPaperName',WallPaperName);
+      WriteInteger('NTentativas',NTentativas);
+      WriteInteger('AutoLogoff',AutoLogoff);
     except
       Free;
       Result := False;
@@ -220,6 +234,7 @@ begin
 end;
 
 procedure Tform_AparenciaDialog.Aplicar(Desktop: TDesktop);
+var DeskVis: Boolean;
 begin
  {aplica configs. no programa}
   with FConfiguracao do
@@ -227,6 +242,7 @@ begin
     with Desktop do
     begin
       Screen.Cursor := crHourGlass;
+      DeskVis := Visible;
       Visible := False;
       ClearIcones;
       LabelColor := IconBackColor;
@@ -236,8 +252,13 @@ begin
         Picture.LoadFromFile(WallPaperName)
       else
         Picture := nil;
+      if Picture <> nil then
+      begin
+        if not PictSizeOK(Picture) then
+          Picture := nil;
+      end;
       CreateIcones;
-      Visible := True;
+      Visible := DeskVis;
       Screen.Cursor := crDefault;
     end;
   end;
@@ -308,8 +329,14 @@ begin
     if Execute then
     begin
       Image_Preview.Picture.LoadFromFile(FileName);
+      Edit_NomeArquivo.Text := FileName;
+      if not PictSizeOK(Image_Preview.Picture) then
+      begin
+        Application.MessageBox(MSG_PICPEQ,CAP_PICPEQ,MB_OKWARNING);
+        Image_Preview.Picture := nil;
+        Edit_NomeArquivo.Text := '';
+      end;
     end;
-    Edit_NomeArquivo.Text := FileName;
   end;
 end;
 
