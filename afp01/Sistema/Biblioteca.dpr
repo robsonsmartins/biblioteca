@@ -6,7 +6,7 @@
 
   Código-fonte principal do Programa.
 
-  Data última revisão: 05/11/2001
+  Data última revisão: 24/11/2001
 
 *****************************************************************************}
 
@@ -33,6 +33,7 @@ uses
   unit_PesquisaDialog in 'unit_PesquisaDialog.pas' {form_PesquisaDialog},
   unit_BackupDialog in 'unit_BackupDialog.pas' {form_BackupBDDialog},
   unit_RestoreDialog in 'unit_RestoreDialog.pas' {form_RestoreBDDialog},
+  unit_SplashForm in 'unit_SplashForm.pas' {form_Splash},
   ZLibEx in '..\Componentes\ZLib\ZLibEx.pas';
 
 {$R *.RES}
@@ -46,8 +47,17 @@ begin
     begin
       Application.Initialize;
       Application.Title := 'Sistema Biblioteca';
-      Application.CreateForm(TDataModule_Biblio, DataModule_Biblio);
-      Application.CreateForm(Tform_Desktop, form_Desktop);
+      with Tform_Splash.Create(nil) do
+      begin
+        try
+          Show;
+          Update;
+          Application.CreateForm(TDataModule_Biblio, DataModule_Biblio);
+          Application.CreateForm(Tform_Desktop, form_Desktop);
+        finally
+          Free;
+        end;
+      end;
       Application.Run;
     end;
 //  end;

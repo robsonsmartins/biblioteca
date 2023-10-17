@@ -212,7 +212,8 @@ begin
         Halt(1);
       end;
     end;
-  until (not Auto) or (Conta.UserName = form_LoginDialog.ContaLogin.UserName);
+  until (not Auto) or (Conta.UserName = form_LoginDialog.ContaLogin.UserName) or
+                      (form_LoginDialog.ContaLogin.UserName = 'ADMIN');
   Conta.Assign(form_LoginDialog.ContaLogin);
   FreeAndNil(form_LoginDialog);
   {configura o AutoLogoff}
