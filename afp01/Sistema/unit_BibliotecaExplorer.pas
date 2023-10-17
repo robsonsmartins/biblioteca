@@ -17,7 +17,7 @@ interface
 uses
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
   ComCtrls, ExtCtrls, ImgList, ToolWin, Menus,
-  unit_DataBaseClasses, StdCtrls;
+  unit_DataBaseClasses, StdCtrls, Variants;
 
 {Classe de Interface}
 type

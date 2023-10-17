@@ -1,5 +1,7 @@
+[FileVersion]
+Version=6.0
 [Compiler]
-A=1
+A=8
 B=0
 C=1
 D=1
@@ -43,14 +45,21 @@ OutputDir=
 UnitOutputDir=
 PackageDLLOutputDir=
 PackageDCPOutputDir=
-SearchPath=F:\Meus documentos\Projeto Biblioteca\Componentes;E:\Robson\BBtca\Comps;E:\Robson\BBtca\Comps\ZLib
+SearchPath=..\Comps;..\Comps\Zlib
 Packages=VCL50;VCLX50;VCLSMP50;VCLDB50;VCLADO50;ibevnt50;VCLBDE50;VCLDBX50;QRPT50;TEEUI50;TEEDB50;TEE50;DSS50;TEEQR50;VCLIB50;VCLMID50;VCLIE50;INETDB50;INET50;NMFAST50;WEBMID50;dclocx50;dclaxserver50
 Conditionals=
-DebugSourceDirs=F:\Meus documentos\Projeto Biblioteca\Componentes\;C:\Pastas Rafael\Faculdade Batista\Projeto Biblioteca\Engenharia de Software II\Projeto\Beta_v0_3_Source\Comps\
+DebugSourceDirs=..\Comps;..\Comps\Zlib
 UsePackages=0
 [Parameters]
 RunParams=
 HostApplication=
+Launcher=
+UseLauncher=0
+DebugCWD=
+[Language]
+ActiveLang=
+ProjectLang=
+RootDir=
 [Version Info]
 IncludeVerInfo=1
 AutoIncBuild=0
@@ -77,22 +86,21 @@ ProductName=Sistema Biblioteca
 ProductVersion=1.0.0.0
 Comments=Sistema Biblioteca - Para uso exclusivo: fins didáticos
 Grupo Biblioteca=Alberto, Granhan Bell, Rafael, Robson, Rute e Sandra
-[Excluded Packages]
-C:\ARQUIV~1\Borland\Delphi5\Projects\Bpl\S303_R50.bpl=SysTools 3 Runtime Package
-C:\ARQUIV~1\Borland\Delphi5\Projects\Bpl\S303BR50.bpl=SysTools 3 DB Runtime Package
 [HistoryLists\hlDebugSourcePath]
-Count=3
-Item0=F:\Meus documentos\Projeto Biblioteca\Componentes\;C:\Pastas Rafael\Faculdade Batista\Projeto Biblioteca\Engenharia de Software II\Projeto\Beta_v0_3_Source\Comps\
-Item1=F:\Meus documentos\Projeto Biblioteca\Componentes\
-Item2=d:\robson\sistema bbt\comps
+Count=4
+Item0=..\Comps;..\Comps\Zlib
+Item1=F:\Meus documentos\Projeto Biblioteca\Componentes\;C:\Pastas Rafael\Faculdade Batista\Projeto Biblioteca\Engenharia de Software II\Projeto\Beta_v0_3_Source\Comps\
+Item2=F:\Meus documentos\Projeto Biblioteca\Componentes\
+Item3=d:\robson\sistema bbt\comps
 [HistoryLists\hlUnitAliases]
 Count=1
 Item0=WinTypes=Windows;WinProcs=Windows;DbiTypes=BDE;DbiProcs=BDE;DbiErrs=BDE;
 [HistoryLists\hlSearchPath]
-Count=3
-Item0=F:\Meus documentos\Projeto Biblioteca\Componentes;E:\Robson\BBtca\Comps;E:\Robson\BBtca\Comps\ZLib
-Item1=C:\Meus documentos\Projeto Biblioteca\Componentes
-Item2=d:\robson\sistema bbt\comps
+Count=4
+Item0=..\Comps;..\Comps\Zlib
+Item1=F:\Meus documentos\Projeto Biblioteca\Componentes;E:\Robson\BBtca\Comps;E:\Robson\BBtca\Comps\ZLib
+Item2=C:\Meus documentos\Projeto Biblioteca\Componentes
+Item3=d:\robson\sistema bbt\comps
 [HistoryLists\hlUnitOutputDirectory]
 Count=1
 Item0=D:\Robson\Sistema BBt
