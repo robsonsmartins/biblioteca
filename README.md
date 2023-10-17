@@ -40,16 +40,10 @@ A documentação do projeto está espalhada em vários arquivos, e pode ser aces
 - [Análise de Requisitos de Sistema](https://github.com/robsonsmartins/biblioteca/blob/main/ars01/ars01.pdf)
 - [Descrição da Implementação do Sistema](https://github.com/robsonsmartins/biblioteca/blob/main/dis01/dis01.pdf)
 - [Especificação dos Requisitos do Sistema](https://github.com/robsonsmartins/biblioteca/blob/main/ers01/ers01.pdf)
-
-As normas gerais do projeto estão aqui:
-
+- [Planejamento de Atividades](https://github.com/robsonsmartins/biblioteca/blob/main/ngp03/ngp03.pdf)
 - [Normas Gerais do Projeto: Normas e Padrões da Documentação](https://github.com/robsonsmartins/biblioteca/blob/main/ngp01/ngp01.pdf)
 - [Normas Gerais do Projeto: Ferramenta de Controle de Revisões (REVDOC)](https://github.com/robsonsmartins/biblioteca/blob/main/ngp02/ngp02.pdf)
-- [Normas Gerais do Projeto: Planejamento de Atividades](https://github.com/robsonsmartins/biblioteca/blob/main/ngp03/ngp03.pdf)
 - [Normas Gerais do Projeto: Nomenclatura na Implementação](https://github.com/robsonsmartins/biblioteca/blob/main/ngp04/ngp04.pdf)
-
-Os manuais do Sistema Biblioteca podem ser acessados aqui:
-
 - [Manual de Instalação do Sistema Biblioteca](https://github.com/robsonsmartins/biblioteca/blob/main/man01/man01.pdf)
 - [Manual de Usuário do Sistema Biblioteca](https://github.com/robsonsmartins/biblioteca/blob/main/man02/man02.pdf)
 - [Manual Técnico do Sistema Biblioteca](https://github.com/robsonsmartins/biblioteca/blob/main/man03/man03.pdf)
@@ -61,14 +55,20 @@ O mais atualizado projeto de software pode ser acessado aqui:
 - [Arquivos-Fonte do Sistema Biblioteca](https://github.com/robsonsmartins/biblioteca/blob/main/afp01)
 - [Arquivos de Script de Banco de Dados](https://github.com/robsonsmartins/biblioteca/blob/main/afp02)
 - [Arquivos do Projeto de Instalação do Sistema Biblioteca](https://github.com/robsonsmartins/biblioteca/blob/main/afp03)
+- [Ferramenta de Controle de Revisões (REVDOC 1.0)](https://github.com/robsonsmartins/biblioteca/blob/main/revdoc)
+- [SQLU - Utilitário para fazer Query's em qualquer BD](https://github.com/robsonsmartins/biblioteca/blob/main/utl01)
 
 O software foi desenvolvido com [Borland Delphi 5](https://en.wikipedia.org/wiki/Borland_Delphi).
+
+A ferramenta REVDOC foi desenvolvida com [Borland Delphi 5](https://en.wikipedia.org/wiki/Borland_Delphi).
+
+A ferramenta SQLU foi desenvolvida com [Borland Delphi 5](https://en.wikipedia.org/wiki/Borland_Delphi).
 
 ## Licença
 
 Distribuído sob a licença [Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License][cc-by-nc-sa]. 
 
-Veja o arquivo [LICENSE](https://github.com/robsonsmartins/bibliotteca/blob/main/LICENSE) para mais informações.
+Veja o arquivo [LICENSE](https://github.com/robsonsmartins/biblioteca/blob/main/LICENSE) para mais informações.
 
 Também são aplicáveis aqui os mesmos "Termos e Condições" e "Política de Privacidade" da [Página Pessoal de Robson Martins](https://www.robsonmartins.com):
 
