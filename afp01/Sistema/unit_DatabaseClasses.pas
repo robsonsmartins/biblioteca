@@ -16,7 +16,7 @@ interface
 
 uses
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
-  Db, ADODB, unit_Comum;
+  Db, ADODB, unit_Comum, Variants;
 
 {**************** Classes base *********************}
 

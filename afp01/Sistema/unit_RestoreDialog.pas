@@ -15,6 +15,8 @@
 
 ******************************************************************************}
 
+{$WARN UNIT_PLATFORM OFF}
+
 unit unit_RestoreDialog;
 
 interface

@@ -44,7 +44,7 @@ uses
   relatorio_DevAcervo in 'relatorio_DevAcervo.pas' {form_RelatorioDevAcervo},
   relatorio_AcervoRet in 'relatorio_AcervoRet.pas' {form_RelatorioAcervoRet},
   relatorio_UsuSusp in 'relatorio_UsuSusp.pas' {form_RelatorioUsuSusp},
-  ZLibEx in '..\Componentes\ZLib\ZLibEx.pas';
+  ZLibEx in '..\Comps\ZLib\ZLibEx.pas';
 
 {$R *.RES}
 begin
