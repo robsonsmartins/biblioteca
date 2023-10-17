@@ -129,7 +129,7 @@ const
     'Tente procurar outro arquivo.';
   CAP_PICPEQ =
     'Imagem muito pequena';
-
+  {constantes usadas pelo backup/restore}
   CAP_ERROBAKALL =
     'Erro na criação da Cópia de Segurança';
   MSG_ERROLEBAK =
@@ -218,6 +218,51 @@ const
     '(esta operação não poderá ser desfeita).';
   CAP_EXCLUIRUSUARIO =
     'Excluir Usuário';
+  {constantes usadas pelo cadastro de fornecedores}
+  MSG_NONOMEF =
+    'O campo "Nome" não pode estar em branco. Digite o Nome do Fornecedor.';
+  MSG_NOENDERECOF =
+    'O campo "Endereço" não pode estar em branco. ' +
+    'Digite o Endereço do Fornecedor.';
+  MSG_EXCLUIRFORNECEDOR =
+    'Tem certeza que deseja excluir o Fornecedor do cadastro ?' + #13#10 +
+    '(esta operação não poderá ser desfeita).';
+  CAP_EXCLUIRFORNECEDOR =
+    'Excluir Fornecedor';
+  {constantes usadas pelo cadastro de acervo}
+  MSG_NOTOMBO =
+    'Digite o número do Tombo no campo correspondente.';
+  CAP_NOTOMBO =
+    'Nenhum exemplar para adicionar';
+  MSG_ATOMBO =
+    'Já existe um exemplar com este número de Tombo. Digite outro Tombo.';
+  CAP_ATOMBO =
+    'Já existe exemplar';
+  MSG_DTOMBO =
+    'Deve existir pelo menos um exemplar do acervo.';
+  CAP_DTOMBO =
+    'Único exemplar';
+  MSG_EXCTOMBO =
+    'Tem certeza que deseja excluir o exemplar do cadastro ?' + #13#10 +
+    '(esta operação não poderá ser desfeita).';
+  CAP_EXCTOMBO =
+    'Excluir exemplar';
+  MSG_EXCLUIRACERVO =
+    'Tem certeza que deseja excluir o Acervo do cadastro ?' + #13#10 +
+    '(esta operação não poderá ser desfeita).';
+  CAP_EXCLUIRACERVO =
+    'Excluir Acervo';
+  MSG_NOTITULO =
+    'O campo "Título" não pode estar em branco. Digite o Título.';
+  MSG_NOAUTOR =
+    'O campo "Autor" não pode estar em branco. Digite o Autor.';
+  MSG_NOEDITORA =
+    'O campo "Editora" não pode estar em branco. Digite a Editora.';
+  MSG_NOEDICAO =
+    'O campo "Edição" não pode estar em branco. Digite a Edição.';
+  MSG_NOEXEMPLARES =
+    'Deve existir pelo menos um exemplar do acervo. Adicione exemplares para ' +
+    'esse acervo.';
   {constantes usadas pelo cadastro de tipos de usuários}
   MSG_NODESCRICAO =
     'O campo "Descrição" não pode estar em branco. Digite a Descrição do ' +

@@ -155,4 +155,68 @@ object DataModule_Biblio: TDataModule_Biblio
     Left = 372
     Top = 316
   end
+  object ADOCommand_Fornecedores: TADOCommand
+    CommandTimeout = 300
+    Connection = ADOConnection_Biblio
+    Parameters = <>
+    ParamCheck = False
+    Left = 184
+    Top = 8
+  end
+  object ADODataSet_Fornecedores: TADODataSet
+    Connection = ADOConnection_Biblio
+    ParamCheck = False
+    Parameters = <>
+    Prepared = True
+    Left = 336
+    Top = 8
+  end
+  object ADOCommand_Acervos: TADOCommand
+    CommandTimeout = 300
+    Connection = ADOConnection_Biblio
+    Parameters = <>
+    ParamCheck = False
+    Left = 56
+    Top = 361
+  end
+  object ADODataSet_Acervos: TADODataSet
+    Connection = ADOConnection_Biblio
+    ParamCheck = False
+    Parameters = <>
+    Prepared = True
+    Left = 200
+    Top = 361
+  end
+  object ADODataSet_Exemplares: TADODataSet
+    Connection = ADOConnection_Biblio
+    ParamCheck = False
+    Parameters = <>
+    Prepared = True
+    Left = 328
+    Top = 365
+  end
+  object ADOCommand_Exemplares: TADOCommand
+    CommandTimeout = 300
+    Connection = ADOConnection_Biblio
+    Parameters = <>
+    ParamCheck = False
+    Left = 452
+    Top = 357
+  end
+  object ADODataSet_Explorer: TADODataSet
+    Connection = ADOConnection_Biblio
+    ParamCheck = False
+    Parameters = <>
+    Prepared = True
+    Left = 456
+    Top = 33
+  end
+  object ADOCommand_Explorer: TADOCommand
+    CommandTimeout = 300
+    Connection = ADOConnection_Biblio
+    Parameters = <>
+    ParamCheck = False
+    Left = 456
+    Top = 89
+  end
 end

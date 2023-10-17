@@ -6,7 +6,7 @@
 
   Contém as classes de Interface do Cadastro de Usuários.
 
-  Data última revisão: 28/10/2001
+  Data última revisão: 24/11/2001
 
 ******************************************************************************}
 
@@ -103,6 +103,9 @@ type
     Memo_Telefone: TMemo;
     Edit_MaxExemplares: TEdit;
     Label_MaxExemplares: TLabel;
+    DateEdit_Expira: TDateTimePicker;
+    CheckBox_Suspenso: TCheckBox;
+    Label_Expira: TLabel;
     {Tratadores de Evento}
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
@@ -174,6 +177,11 @@ begin
     Edit_CPF.Text := CPF;
     Edit_CEP.Text := CEP;
     Edit_DataCadastro.Text := DateToStr(DataCadastro);
+    if Situacao = 'N' then
+      CheckBox_Suspenso.Checked := False
+    else
+      CheckBox_Suspenso.Checked := True;
+    DateEdit_Expira.DateTime := DataExpiraSusp;
     with TipoUsuario do
     begin
       Edit_TempoEmprestimo.Text := IntToStr(TempoEmprestimo);
@@ -222,6 +230,11 @@ begin
     CPF := Edit_CPF.Text;
     CEP := Edit_CEP.Text;
     DataCadastro := StrToDate(Edit_DataCadastro.Text);
+    if CheckBox_Suspenso.Checked then
+      Situacao := 'S'
+    else
+      Situacao := 'N';
+    DataExpiraSusp := DateEdit_Expira.DateTime;
     with TipoUsuario do
     begin
       TempoEmprestimo := StrToInt(Edit_TempoEmprestimo.Text);
@@ -360,7 +373,8 @@ begin
     else if (Length(Edit_RGA.Text) = 0) and
             (UpperCase(Items[ItemIndex]) = 'ALUNO') then
       ExibeMensagem(Edit_RGA,MSG_NORGA,CAP_NOALL,MB_OKWARNING)
-    else if DataInterface.FDataClass.Exists(Edit_RGA.Text) then
+    else if (DataInterface.FDataClass.Exists(Edit_RGA.Text)) and
+            (DataInterface.FDataClass.State <> stEdit) then
       ExibeMensagem(Edit_RGA,MSG_EXISTERGA,CAP_NOALL,MB_OKWARNING)
     else
       Result := True;

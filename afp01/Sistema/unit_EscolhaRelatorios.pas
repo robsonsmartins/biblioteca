@@ -1,3 +1,11 @@
+{
+Os seguintes relatórios deverão ser emitidos pelo Sistema Biblioteca:
+Livros mais retirados,
+Relação dos livros emprestados por aluno em um determinado período de tempo,
+Relação dos alunos / funcionários que
+ emprestaram / devolveram livros em um determinado período de tempo,
+Relação dos livros cadastrados no sistema.
+}
 unit unit_EscolhaRelatorios;
 
 interface
@@ -8,49 +16,18 @@ uses
 
 type
   Tform_EscolhaRelatorios = class(TForm)
-    MainMenu1: TMainMenu;
-    Relatrio1: TMenuItem;
-    Imprimir1: TMenuItem;
-    ConfigurarImpressora1: TMenuItem;
-    VisualizarImpresso1: TMenuItem;
-    Fechar1: TMenuItem;
-    N1: TMenuItem;
-    Relatrios1: TMenuItem;
-    SituaodoUsurio1: TMenuItem;
-    SituaodoAcervo1: TMenuItem;
-    ListadeReservas1: TMenuItem;
-    Relatrios2: TMenuItem;
-    MovimentaodoAcervo1: TMenuItem;
-    MovimentaodeUsurios1: TMenuItem;
-    Listagens1: TMenuItem;
-    CadastrodeAcervo1: TMenuItem;
-    CadastrodeUsurios1: TMenuItem;
-    CadastrodeFornecedores1: TMenuItem;
     ToolBar1: TToolBar;
-    ToolButton1: TToolButton;
-    ToolButton2: TToolButton;
     ToolButton3: TToolButton;
-    ToolButton4: TToolButton;
-    ToolButton5: TToolButton;
-    ToolButton6: TToolButton;
-    ToolButton7: TToolButton;
-    ToolButton8: TToolButton;
-    ToolButton9: TToolButton;
-    ToolButton10: TToolButton;
-    ToolButton11: TToolButton;
-    ToolButton12: TToolButton;
-    ToolButton13: TToolButton;
-    ToolButton14: TToolButton;
-    ToolButton15: TToolButton;
     ToolButton16: TToolButton;
     ImageList1: TImageList;
+    ListView1: TListView;
+    ToolButton1: TToolButton;
     Panel1: TPanel;
-    Edit1: TEdit;
+    DateTimePicker1: TDateTimePicker;
     Label1: TLabel;
-    StaticText1: TStaticText;
-    Edit2: TEdit;
+    DateTimePicker2: TDateTimePicker;
     Label2: TLabel;
-    QRPreview1: TQRPreview;
+    Label3: TLabel;
   private
     { Private declarations }
   public
