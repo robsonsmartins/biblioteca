@@ -93,6 +93,12 @@ type
     ADOCommand_TipoAcervos: TADOCommand;
     ADODataSet_AreaAcervos: TADODataSet;
     ADOCommand_AreaAcervos: TADOCommand;
+    ADODataSet_GrupoLogins: TADODataSet;
+    ADOCommand_GrupoLogins: TADOCommand;
+    ADOCommand_ContaLogins: TADOCommand;
+    ADODataSet_ContaLogins: TADODataSet;
+    ADOCommand_RegLogin: TADOCommand;
+    ADODataSet_RegLogin: TADODataSet;
     procedure DataModuleCreate(Sender: TObject);
   private
     { Private declarations }
@@ -192,6 +198,69 @@ type
     procedure Assign(Source: TUsuario);
   end;
 
+{TDireitos}
+{Campo Permissoes de GRUPOLOGIN traduzido}
+type
+  TDireitos = class(TDataRecord)
+  public
+    { Public declarations }
+    VerCadUsuarios: Boolean;
+    VerCadFornecedores: Boolean;
+    VerCadAcervo: Boolean;
+    VerPainelControle: Boolean;
+    VerExplorer: Boolean;
+    VerRelatorios: Boolean;
+    AlterarCadUsuarios: Boolean;
+    AlterarCadFornecedores: Boolean;
+    AlterarCadAcervo: Boolean;
+    Emprestar: Boolean;
+    Devolver: Boolean;
+    MoverPerdido: Boolean;
+    Reservar: Boolean;
+  end;
+
+{TGrupoLogin}
+{um registro da tabela GRUPOLOGIN}
+type
+  TGrupoLogin = class(TDataRecord)
+  public
+    { Public declarations }
+    IdGrupo: Integer;
+    Descricao: String20;
+    Permissoes: String20;
+    constructor Create;
+    procedure Assign(Source: TGrupoLogin);
+    procedure SetPermissoes(Direitos: TDireitos);
+    procedure GetPermissoes(var Direitos: TDireitos);
+  end;
+
+{TContaLogin}
+{um registro da tabela CONTALOGIN}
+type
+  TContaLogin = class(TDataRecord)
+  public
+    { Public declarations }
+    IdConta: Integer;
+    Nome: String50;
+    UserName: String10;
+    Senha: String10;
+    GrupoLogin: TGrupoLogin;
+    constructor Create;
+    destructor Destroy; override;
+    procedure Assign(Source: TContaLogin);
+    function GetPassword: String;
+    procedure SetPassword(Password: String);
+  end;
+
+{TRegistroLogin}
+{tabela REGLOGIN}
+type
+  TRegistroLogin = class(TDataRecord)
+  public
+    { Public declarations }
+    procedure Login(IdConta: Integer);
+  end;
+
 {TUsuarios}
 {contém os dados relativos ao Cadastro de Usuários}
 type
@@ -236,6 +305,7 @@ type
     function RecCount: Integer; override;
     procedure Search(var ADODataSet: TADODataSet; FilterStr: String);
     procedure LocateId(Id: Integer);
+    function Exists(RGA: String): Boolean;
   end;
 
 {TTipoUsuarios}
@@ -468,6 +538,98 @@ type
     function Exists(Descricao: String): Boolean;
   end;
 
+{TGrupoLogins}
+{contém os dados relativos ao Cadastro de Grupos de Login}
+type
+  TGrupoLogins = class(TDataClass)
+  private
+    { Private declarations }
+    {rotinas de gravação no BD}
+    FDataRecord: TGrupoLogin;
+    procedure PostInsert;
+    procedure PostDelete;
+    procedure PostEdit;
+    {rotinas para atribuir propriedades}
+    procedure SetRegistro(Value: TGrupoLogin);
+    function GetRegistro: TGrupoLogin;
+    function GetRecNo: Integer;
+  protected
+    { Protected declarations }
+  public
+    { Public declarations }
+    {redeclaração das propriedades e reimplementação dos métodos do TDataClass}
+    constructor Create; override;
+    property RecNo: Integer read GetRecNo;
+    property Registro: TGrupoLogin read GetRegistro write SetRegistro;
+    procedure Refresh; override;
+    procedure Insert; override;
+    {grava no banco de dados os registros do objeto}
+    procedure Post; override;
+    {atualiza o registro corrente com o do BD}
+    procedure Read; override;
+    {movimentação do cursor nos registros do objeto}
+    procedure First; override;
+    procedure Last; override;
+    procedure Prior; override;
+    procedure Next; override;
+    {vai direto para um registro na posição especificada}
+    procedure GotoReg(RecIndex: Integer); override;
+    {retorna a posição do cursor Begin Of File (primeiro registro) ou
+     End Of File (último registro) no objeto}
+    function Bof: Boolean; override;
+    function Eof: Boolean; override;
+    {retorna a quantidade de registros do objeto}
+    function RecCount: Integer; override;
+    procedure LocateDescricao(Descricao: String);
+    function Exists(Descricao: String): Boolean;
+  end;
+
+{TContaLogins}
+{contém os dados relativos ao Cadastro de Contas de Login}
+type
+  TContaLogins = class(TDataClass)
+  private
+    { Private declarations }
+    {rotinas de gravação no BD}
+    FDataRecord: TContaLogin;
+    procedure PostInsert;
+    procedure PostDelete;
+    procedure PostEdit;
+    {rotinas para atribuir propriedades}
+    procedure SetRegistro(Value: TContaLogin);
+    function GetRegistro: TContaLogin;
+    function GetRecNo: Integer;
+  protected
+    { Protected declarations }
+  public
+    { Public declarations }
+    {redeclaração das propriedades e reimplementação dos métodos do TDataClass}
+    constructor Create; override;
+    property RecNo: Integer read GetRecNo;
+    property Registro: TContaLogin read GetRegistro write SetRegistro;
+    procedure Refresh; override;
+    procedure Insert; override;
+    {grava no banco de dados os registros do objeto}
+    procedure Post; override;
+    {atualiza o registro corrente com o do BD}
+    procedure Read; override;
+    {movimentação do cursor nos registros do objeto}
+    procedure First; override;
+    procedure Last; override;
+    procedure Prior; override;
+    procedure Next; override;
+    {vai direto para um registro na posição especificada}
+    procedure GotoReg(RecIndex: Integer); override;
+    {retorna a posição do cursor Begin Of File (primeiro registro) ou
+     End Of File (último registro) no objeto}
+    function Bof: Boolean; override;
+    function Eof: Boolean; override;
+    {retorna a quantidade de registros do objeto}
+    function RecCount: Integer; override;
+    procedure LocateUserName(UserName: String);
+    function Exists(UserName: String): Boolean;
+  end;
+
 {**************** Variáveis Globais *********************}
 
 var
@@ -681,6 +843,146 @@ begin
   {copia as propriedades de um outro TClassificacaoAcervo}
   IdClassificacaoAcervo := Source.IdClassificacaoAcervo;
   Descricao := Source.Descricao;
+end;
+
+{-------------------- TGrupoLogin -----------------------}
+
+constructor TGrupoLogin.Create;
+var Direitos: TDireitos;
+begin
+  {cria um objeto TGrupoLogin}
+  inherited Create;
+  IdGrupo := 0;
+  Descricao := '';
+  Direitos := TDireitos.Create;
+  with Direitos do
+  begin
+    VerCadUsuarios := False;
+    VerCadFornecedores := False;
+    VerCadAcervo := False;
+    VerPainelControle := False;
+    VerExplorer := True;
+    VerRelatorios := False;
+    AlterarCadUsuarios := False;
+    AlterarCadFornecedores := False;
+    AlterarCadAcervo := False;
+    Emprestar := False;
+    Devolver := False;
+    MoverPerdido := False;
+    Reservar := False;
+  end;
+  SetPermissoes(Direitos);
+  Direitos.Free;
+end;
+
+procedure TGrupoLogin.Assign(Source: TGrupoLogin);
+begin
+  {copia as propriedades de um outro TGrupoLogin}
+  IdGrupo := Source.IdGrupo;
+  Descricao := Source.Descricao;
+  Permissoes := Source.Permissoes;
+end;
+
+procedure TGrupoLogin.SetPermissoes(Direitos: TDireitos);
+var TmpChar: Char;
+begin
+  {configura as permissões - traduzido}
+  Permissoes := '';
+  with Direitos do
+  begin
+    TmpChar := #0;
+    TmpChar := Char(Ord(TmpChar) or (BoolToInt(VerCadUsuarios) shl 7));
+    TmpChar := Char(Ord(TmpChar) or (BoolToInt(VerCadFornecedores) shl 6));
+    TmpChar := Char(Ord(TmpChar) or (BoolToInt(VerCadAcervo) shl 5));
+    TmpChar := Char(Ord(TmpChar) or (BoolToInt(VerPainelControle) shl 4));
+    TmpChar := Char(Ord(TmpChar) or (BoolToInt(VerExplorer) shl 3));
+    TmpChar := Char(Ord(TmpChar) or (BoolToInt(VerRelatorios) shl 2));
+    TmpChar := Char(Ord(TmpChar) or (BoolToInt(AlterarCadUsuarios) shl 1));
+    TmpChar := Char(Ord(TmpChar) or BoolToInt(AlterarCadFornecedores));
+    Permissoes := Permissoes + TmpChar;
+    TmpChar := Char($E0);
+    TmpChar := Char(Ord(TmpChar) or (BoolToInt(AlterarCadAcervo) shl 4));
+    TmpChar := Char(Ord(TmpChar) or (BoolToInt(Emprestar) shl 3));
+    TmpChar := Char(Ord(TmpChar) or (BoolToInt(Devolver) shl 2));
+    TmpChar := Char(Ord(TmpChar) or (BoolToInt(MoverPerdido) shl 1));
+    TmpChar := Char(Ord(TmpChar) or BoolToInt(Reservar));
+    Permissoes := Permissoes + TmpChar;
+  end;
+end;
+
+procedure TGrupoLogin.GetPermissoes(var Direitos: TDireitos);
+begin
+  {lê as permissões - traduzido}
+  with Direitos do
+  begin
+    VerCadUsuarios := (Ord(Permissoes[1]) and $80) <> 0;
+    VerCadFornecedores := (Ord(Permissoes[1]) and $40) <> 0;
+    VerCadAcervo := (Ord(Permissoes[1]) and $20) <> 0;
+    VerPainelControle := (Ord(Permissoes[1]) and $10) <> 0;
+    VerExplorer := (Ord(Permissoes[1]) and $08) <> 0;
+    VerRelatorios := (Ord(Permissoes[1]) and $04) <> 0;
+    AlterarCadUsuarios := (Ord(Permissoes[1]) and $02) <> 0;
+    AlterarCadFornecedores := (Ord(Permissoes[1]) and $01) <> 0;
+    AlterarCadAcervo := (Ord(Permissoes[2]) and $10) <> 0;
+    Emprestar := (Ord(Permissoes[2]) and $08) <> 0;
+    Devolver := (Ord(Permissoes[2]) and $04) <> 0;
+    MoverPerdido := (Ord(Permissoes[2]) and $02) <> 0;
+    Reservar := (Ord(Permissoes[2]) and $01) <> 0;
+  end;
+end;
+
+{-------------------- TContaLogin -----------------------}
+
+constructor TContaLogin.Create;
+begin
+  {cria um objeto TContaLogin}
+  inherited Create;
+  IdConta := 0;
+  Nome := '';
+  UserName := '';
+  Senha := '';
+  GrupoLogin := TGrupoLogin.Create;
+end;
+
+destructor TContaLogin.Destroy;
+begin
+  {destrói um objeto TContaLogin}
+  GrupoLogin.Free;
+  inherited Destroy;
+end;
+
+procedure TContaLogin.Assign(Source: TContaLogin);
+begin
+  {copia as propriedades de um outro TContaLogin}
+  IdConta := Source.IdConta;
+  Nome := Source.Nome;
+  UserName := Source.UserName;
+  Senha := Source.Senha;
+  GrupoLogin.Assign(Source.GrupoLogin);
+end;
+
+function TContaLogin.GetPassword: String;
+var i: Integer;
+begin
+  {retorna a senha desencriptada}
+  Result := '';
+  if Senha = #244 then
+    Result := ''
+  else
+    for i := 1 to Length(Senha) do
+      Result := Result + Char(Ord(Senha[i]) - i * 3);
+end;
+
+procedure TContaLogin.SetPassword(Password: String);
+var i: Integer;
+begin
+  {configura a senha criptografada}
+  Senha := '';
+  if Length(Password) = 0 then
+    Senha := #244
+  else
+    for i := 1 to Length(Password) do
+      Senha := Senha + Char(Ord(Password[i]) + i * 3);
 end;
 
 {-------------------- TUsuarios -----------------------}
@@ -1141,6 +1443,16 @@ begin
   with DataModule_Biblio.ADODataSet_Usuarios do
     Locate('IdUsuario', Id,[]);
   Self.Read;
+end;
+
+function TUsuarios.Exists(RGA: String): Boolean;
+begin
+  {retorna True se RGA do usuário existe}
+  Result := False;
+  if (RecCount = 0) or (RGA = '') then
+    exit;
+  with DataModule_Biblio.ADODataSet_Usuarios do
+    Result := Locate('RGA', RGA,[]);
 end;
 
 {-------------------- TTipoUsuarios -----------------------}
@@ -2928,10 +3240,778 @@ begin
   end;
 end;
 
+{-------------------- TGrupoLogins -----------------------}
+
+constructor TGrupoLogins.Create;
+begin
+  inherited Create;
+  {inicializa valores}
+  FDataRecord := TGrupoLogin.Create;
+  DataModule_Biblio.ADODataSet_GrupoLogins.Close;
+end;
+
+procedure TGrupoLogins.GotoReg(RecIndex: Integer);
+begin
+  {reabre dataset, se necessário}
+  Self.Refresh;
+  {move cursor para o indice dado}
+  with DataModule_Biblio.ADODataSet_GrupoLogins do
+    if (RecIndex > 0) and (RecIndex <= RecordCount) then
+      RecNo := RecIndex;
+  {lê o registro}
+  Self.Read;
+end;
+
+procedure TGrupoLogins.First;
+begin
+  {reabre dataset, se necessário}
+  Self.Refresh;
+  {move cursor}
+  with DataModule_Biblio.ADODataSet_GrupoLogins do
+    First;
+  {lê o registro}
+  Self.Read;
+end;
+
+procedure TGrupoLogins.Last;
+begin
+  {reabre dataset, se necessário}
+  Self.Refresh;
+  {move cursor}
+  with DataModule_Biblio.ADODataSet_GrupoLogins do
+    Last;
+  {lê o registro}
+  Self.Read;
+end;
+
+procedure TGrupoLogins.Prior;
+begin
+  {reabre dataset, se necessário}
+  Self.Refresh;
+  {move cursor}
+  with DataModule_Biblio.ADODataSet_GrupoLogins do
+    Prior;
+  {lê o registro}
+  Self.Read;
+end;
+
+procedure TGrupoLogins.Next;
+begin
+  {reabre dataset, se necessário}
+  Self.Refresh;
+  {move cursor}
+  with DataModule_Biblio.ADODataSet_GrupoLogins do
+    Next;
+  {lê o registro}
+  Self.Read;
+end;
+
+procedure TGrupoLogins.SetRegistro(Value: TGrupoLogin);
+begin
+  {permite acesso ao registro}
+  FDataRecord := Value;
+end;
+
+function TGrupoLogins.GetRegistro: TGrupoLogin;
+begin
+  {permite acesso ao registro}
+  Result := FDataRecord;
+end;
+
+function TGrupoLogins.Bof: Boolean;
+begin
+  {retorna True se for o primeiro registro}
+  with DataModule_Biblio.ADODataSet_GrupoLogins do
+    Result := (RecNo = 1);
+end;
+
+function TGrupoLogins.Eof: Boolean;
+begin
+  {retorna True se for o último registro}
+  with DataModule_Biblio.ADODataSet_GrupoLogins do
+    Result := (RecNo = RecordCount);
+end;
+
+function TGrupoLogins.RecCount: Integer;
+begin
+  {retorna a quantidade de registros}
+  with DataModule_Biblio.ADODataSet_GrupoLogins do
+    Result := RecordCount;
+end;
+
+function TGrupoLogins.GetRecNo: Integer;
+begin
+  {retorna numero do reg atual}
+  with DataModule_Biblio.ADODataSet_GrupoLogins do
+    Result := RecNo;
+end;
+
+procedure TGrupoLogins.Insert;
+begin
+  {coloca em modo stInsert}
+  if FState = stRead then
+  begin
+    FDataRecord := TGrupoLogin.Create;
+    FState := stInsert;
+  end;
+end;
+
+procedure TGrupoLogins.Refresh;
+begin
+  {lê o banco de dados e atribui valores a classe de Dados}
+  with DataModule_Biblio.ADODataSet_GrupoLogins,
+       DataModule_Biblio.ADOCommand_GrupoLogins do
+  begin
+    {se recordset está ativo, não faz nada}
+    if DataModule_Biblio.ADODataSet_GrupoLogins.Active then
+      exit;
+    FState := stDBWait;
+    Screen.Cursor := crSQLWait;
+    CommandText :=
+      'SELECT * ' +
+      'FROM ' +
+      '  GRUPOLOGIN ' +
+      'ORDER BY DESCRICAO';
+    try
+      RecordSet := Execute;
+    except
+      on E: Exception do
+      begin
+        with Application do
+          MessageBox(PChar(MSG_ERROSELECT + E.Message),
+                     CAP_ERRODB,MB_OKICONSTOP);
+        FState := stRead;
+        Screen.Cursor := crDefault;
+        exit;
+      end;
+    end;
+    Open;
+    First;
+  end;
+  Self.Read;
+  FState := stRead;
+  Screen.Cursor := crDefault;
+end;
+
+procedure TGrupoLogins.Read;
+begin
+  {lê registro atual}
+  with DataModule_Biblio.ADODataSet_GrupoLogins, FDataRecord do
+  begin
+    if (not Active) or (RecordCount = 0) then
+      exit;
+    IdGrupo := FieldByName('IdGrupo').AsInteger;
+    Descricao := FieldByName('Descricao').AsString;
+    Permissoes := FieldByName('Permissoes').AsString;
+  end;
+end;
+
+procedure TGrupoLogins.PostInsert;
+var id: Integer;
+begin
+  FState := stDBWait;
+  id := DataModule_Biblio.ADODataSet_GrupoLogins.RecNo;
+  DataModule_Biblio.ADODataSet_GrupoLogins.Close;
+  with DataModule_Biblio.ADODataSet_GrupoLogins,
+       DataModule_Biblio.ADOCommand_GrupoLogins, FDataRecord do
+  begin
+    {Insere o registro na Tabela}
+    ShortDateFormat := 'yyyy/mm/dd';
+    CommandText :=
+      'INSERT INTO ' +
+      '  GRUPOLOGIN ' +
+      '    (DESCRICAO,' +
+      '     PERMISSOES) ' +
+      'VALUES ' +
+      '  (' + #39 + Descricao + #39 + ',' +
+      '   ' + #39 + Permissoes + #39 + ')';
+    ShortDateFormat := 'dd/mm/yyyy';
+    try
+      Execute;
+    except
+      on E: Exception do
+      begin
+        with Application do
+          MessageBox(PChar(MSG_ERROINSERT + E.Message),
+                     CAP_ERRODB,MB_OKICONSTOP);
+        FState := stRead;
+        Self.Refresh;
+        GotoReg(id);
+        Self.Read;
+        Screen.Cursor := crDefault;
+        exit;
+      end;
+    end;
+    {Lê o Id do registro}
+    CommandText :=
+      'SELECT ' +
+      '  IDGRUPO ' +
+      'FROM ' +
+      '  GRUPOLOGIN ' +
+      'WHERE ' +
+      '  (DESCRICAO = ' + #39 + Descricao + #39 + ') AND ' +
+      '  (PERMISSOES = ' + #39 + Permissoes + #39 + ')';
+    try
+      RecordSet := Execute;
+    except
+      on E: Exception do
+      begin
+        with Application do
+          MessageBox(PChar(MSG_ERROSELECT + E.Message),
+                     CAP_ERRODB,MB_OKICONSTOP);
+        FState := stRead;
+        Self.Refresh;
+        GotoReg(id);
+        Self.Read;
+        Screen.Cursor := crDefault;
+        exit;
+      end;
+    end;
+    Open;
+    id := FieldByName('IdGrupo').AsInteger;
+    Close;
+    Self.Refresh;
+    {posiciona no registro}
+    Locate('IdGrupo', id,[]);
+  end;
+  Self.Read;
+end;
+
+procedure TGrupoLogins.PostEdit;
+var id: Integer;
+begin
+  FState := stDBWait;
+  DataModule_Biblio.ADODataSet_GrupoLogins.Close;
+  with DataModule_Biblio.ADODataSet_GrupoLogins,
+       DataModule_Biblio.ADOCommand_GrupoLogins, FDataRecord do
+  begin
+    {Faz Update do registro na Tabela}
+    id := IdGrupo;
+    ShortDateFormat := 'yyyy/mm/dd';
+    CommandText :=
+      'UPDATE ' +
+      '  GRUPOLOGIN ' +
+      'SET ' +
+      '  DESCRICAO = ' + #39 + Descricao + #39 + ',' +
+      '  PERMISSOES = ' + #39 + Permissoes + #39 + ' ' +
+      'WHERE ' +
+      '  IDGRUPO = ' + IntToStr(IdGrupo);
+    ShortDateFormat := 'dd/mm/yyyy';
+    try
+      Execute;
+    except
+      on E: Exception do
+      begin
+        with Application do
+          MessageBox(PChar(MSG_ERROUPDATE + E.Message),
+                     CAP_ERRODB,MB_OKICONSTOP);
+        FState := stRead;
+        Screen.Cursor := crDefault;
+        Self.Refresh;
+        Locate('IdGrupo', id,[]);
+        Self.Read;
+        exit;
+      end;
+    end;
+    Self.Refresh;
+    {posiciona no registro}
+    Locate('IdGrupo', id,[]);
+    Self.Read;
+  end;
+end;
+
+procedure TGrupoLogins.PostDelete;
+var id: Integer;
+begin
+  FState := stDBWait;
+  with DataModule_Biblio.ADOCommand_GrupoLogins, FDataRecord do
+  begin
+    id := DataModule_Biblio.ADODataSet_GrupoLogins.RecNo;
+    DataModule_Biblio.ADODataSet_GrupoLogins.Close;
+    {apaga registro na Tabela}
+    CommandText :=
+      'DELETE FROM ' +
+      '  GRUPOLOGIN ' +
+      'WHERE ' +
+      '  IDGRUPO = ' + IntToStr(IdGrupo);
+    try
+      Execute;
+    except
+      on E: Exception do
+      begin
+        with Application do
+          MessageBox(PChar(MSG_ERRODELETE + E.Message),
+                     CAP_ERRODB,MB_OKICONSTOP);
+        FState := stRead;
+        Self.Refresh;
+        GotoReg(id);
+        Self.Read;
+        Screen.Cursor := crDefault;
+        exit;
+      end;
+    end;
+  end;
+  Self.Refresh;
+  if id - 1 > 0 then
+    GotoReg(id - 1);
+  Self.Read;
+end;
+
+procedure TGrupoLogins.Post;
+begin
+  {grava o registro atual no banco de dados}
+  if (FState = stRead) or (FState = stDBWait) then
+    exit;
+  Screen.Cursor := crSQLWait;
+  case FState of
+    stInsert: PostInsert;
+    stDelete: PostDelete;
+    stEdit: PostEdit;
+  end;
+  FState := stRead;
+  Screen.Cursor := crDefault;
+end;
+
+procedure TGrupoLogins.LocateDescricao(Descricao: String);
+begin
+  {posiciona no registro}
+  with DataModule_Biblio.ADODataSet_GrupoLogins do
+    Locate('Descricao', Descricao,[]);
+  Self.Read;
+end;
+
+function TGrupoLogins.Exists(Descricao: String): Boolean;
+var i: Integer;
+begin
+  {retorna True se tipo de usuário existe}
+  Result := False;
+  if RecCount = 0 then
+    exit;
+  for i := 1 to RecCount do
+  begin
+    GotoReg(i);
+    if Registro.Descricao = Descricao then
+    begin
+      Result := True;
+      break;
+    end;
+  end;
+end;
+
+{-------------------- TContaLogins -----------------------}
+
+constructor TContaLogins.Create;
+begin
+  inherited Create;
+  {inicializa valores}
+  FDataRecord := TContaLogin.Create;
+  DataModule_Biblio.ADODataSet_ContaLogins.Close;
+end;
+
+procedure TContaLogins.GotoReg(RecIndex: Integer);
+begin
+  {reabre dataset, se necessário}
+  Self.Refresh;
+  {move cursor para o indice dado}
+  with DataModule_Biblio.ADODataSet_ContaLogins do
+    if (RecIndex > 0) and (RecIndex <= RecordCount) then
+      RecNo := RecIndex;
+  {lê o registro}
+  Self.Read;
+end;
+
+procedure TContaLogins.First;
+begin
+  {reabre dataset, se necessário}
+  Self.Refresh;
+  {move cursor}
+  with DataModule_Biblio.ADODataSet_ContaLogins do
+    First;
+  {lê o registro}
+  Self.Read;
+end;
+
+procedure TContaLogins.Last;
+begin
+  {reabre dataset, se necessário}
+  Self.Refresh;
+  {move cursor}
+  with DataModule_Biblio.ADODataSet_ContaLogins do
+    Last;
+  {lê o registro}
+  Self.Read;
+end;
+
+procedure TContaLogins.Prior;
+begin
+  {reabre dataset, se necessário}
+  Self.Refresh;
+  {move cursor}
+  with DataModule_Biblio.ADODataSet_ContaLogins do
+    Prior;
+  {lê o registro}
+  Self.Read;
+end;
+
+procedure TContaLogins.Next;
+begin
+  {reabre dataset, se necessário}
+  Self.Refresh;
+  {move cursor}
+  with DataModule_Biblio.ADODataSet_ContaLogins do
+    Next;
+  {lê o registro}
+  Self.Read;
+end;
+
+procedure TContaLogins.SetRegistro(Value: TContaLogin);
+begin
+  {permite acesso ao registro}
+  FDataRecord := Value;
+end;
+
+function TContaLogins.GetRegistro: TContaLogin;
+begin
+  {permite acesso ao registro}
+  Result := FDataRecord;
+end;
+
+function TContaLogins.Bof: Boolean;
+begin
+  {retorna True se for o primeiro registro}
+  with DataModule_Biblio.ADODataSet_ContaLogins do
+    Result := (RecNo = 1);
+end;
+
+function TContaLogins.Eof: Boolean;
+begin
+  {retorna True se for o último registro}
+  with DataModule_Biblio.ADODataSet_ContaLogins do
+    Result := (RecNo = RecordCount);
+end;
+
+function TContaLogins.RecCount: Integer;
+begin
+  {retorna a quantidade de registros}
+  with DataModule_Biblio.ADODataSet_ContaLogins do
+    Result := RecordCount;
+end;
+
+function TContaLogins.GetRecNo: Integer;
+begin
+  {retorna numero do reg atual}
+  with DataModule_Biblio.ADODataSet_ContaLogins do
+    Result := RecNo;
+end;
+
+procedure TContaLogins.Insert;
+begin
+  {coloca em modo stInsert}
+  if FState = stRead then
+  begin
+    FDataRecord := TContaLogin.Create;
+    FState := stInsert;
+  end;
+end;
+
+procedure TContaLogins.Refresh;
+begin
+  {lê o banco de dados e atribui valores a classe de Dados}
+  with DataModule_Biblio.ADODataSet_ContaLogins,
+       DataModule_Biblio.ADOCommand_ContaLogins do
+  begin
+    {se recordset está ativo, não faz nada}
+    if DataModule_Biblio.ADODataSet_ContaLogins.Active then
+      exit;
+    FState := stDBWait;
+    Screen.Cursor := crSQLWait;
+    CommandText :=
+      'SELECT ' +
+      '  C.*, ' +
+      '  G.DESCRICAO, ' +
+      '  G.PERMISSOES ' +
+      'FROM ' +
+      '  CONTALOGIN C,' +
+      '  GRUPOLOGIN G ' +
+      'WHERE ' +
+      '  G.IDGRUPO = C.IDGRUPO ' +
+      'ORDER BY C.USERNAME';
+    try
+      RecordSet := Execute;
+    except
+      on E: Exception do
+      begin
+        with Application do
+          MessageBox(PChar(MSG_ERROSELECT + E.Message),
+                     CAP_ERRODB,MB_OKICONSTOP);
+        FState := stRead;
+        Screen.Cursor := crDefault;
+        exit;
+      end;
+    end;
+    Open;
+    First;
+  end;
+  Self.Read;
+  FState := stRead;
+  Screen.Cursor := crDefault;
+end;
+
+procedure TContaLogins.Read;
+begin
+  {lê registro atual}
+  with DataModule_Biblio.ADODataSet_ContaLogins, FDataRecord do
+  begin
+    if (not Active) or (RecordCount = 0) then
+      exit;
+    IdConta := FieldByName('IdConta').AsInteger;
+    Nome := FieldByName('Nome').AsString;
+    UserName := FieldByName('UserName').AsString;
+    Senha := FieldByName('Senha').AsString;
+    GrupoLogin.Descricao := FieldByName('Descricao').AsString;
+    GrupoLogin.Permissoes := FieldByName('Permissoes').AsString;
+    GrupoLogin.IdGrupo := FieldByName('IdGrupo').AsInteger;
+  end;
+end;
+
+procedure TContaLogins.PostInsert;
+var id: Integer;
+begin
+  FState := stDBWait;
+  id := DataModule_Biblio.ADODataSet_ContaLogins.RecNo;
+  DataModule_Biblio.ADODataSet_ContaLogins.Close;
+  with DataModule_Biblio.ADODataSet_ContaLogins,
+       DataModule_Biblio.ADOCommand_ContaLogins, FDataRecord do
+  begin
+    {Insere o registro na Tabela}
+    ShortDateFormat := 'yyyy/mm/dd';
+    CommandText :=
+      'INSERT INTO ' +
+      '  CONTALOGIN ' +
+      '    (NOME,' +
+      '     USERNAME,' +
+      '     SENHA,' +
+      '     IDGRUPO) ' +
+      'VALUES ' +
+      '  (' + #39 + Nome + #39 + ',' +
+      '   ' + #39 + UserName + #39 + ',' +
+      '   ' + #39 + Senha + #39 + ',' +
+      '   ' + IntToStr(GrupoLogin.IdGrupo) + ')';
+    ShortDateFormat := 'dd/mm/yyyy';
+    try
+      Execute;
+    except
+      on E: Exception do
+      begin
+        with Application do
+          MessageBox(PChar(MSG_ERROINSERT + E.Message),
+                     CAP_ERRODB,MB_OKICONSTOP);
+        FState := stRead;
+        Self.Refresh;
+        GotoReg(id);
+        Self.Read;
+        Screen.Cursor := crDefault;
+        exit;
+      end;
+    end;
+    {Lê o Id do registro}
+    CommandText :=
+      'SELECT ' +
+      '  IDCONTA ' +
+      'FROM ' +
+      '  CONTALOGIN ' +
+      'WHERE ' +
+      '  (NOME = ' + #39 + Nome + #39 + ') AND ' +
+      '  (USERNAME = ' + #39 + UserName + #39 + ')';
+    try
+      RecordSet := Execute;
+    except
+      on E: Exception do
+      begin
+        with Application do
+          MessageBox(PChar(MSG_ERROSELECT + E.Message),
+                     CAP_ERRODB,MB_OKICONSTOP);
+        FState := stRead;
+        Self.Refresh;
+        GotoReg(id);
+        Self.Read;
+        Screen.Cursor := crDefault;
+        exit;
+      end;
+    end;
+    Open;
+    id := FieldByName('IdConta').AsInteger;
+    Close;
+    Self.Refresh;
+    {posiciona no registro}
+    Locate('IdConta', id,[]);
+  end;
+  Self.Read;
+end;
+
+procedure TContaLogins.PostEdit;
+var id: Integer;
+begin
+  FState := stDBWait;
+  DataModule_Biblio.ADODataSet_ContaLogins.Close;
+  with DataModule_Biblio.ADODataSet_ContaLogins,
+       DataModule_Biblio.ADOCommand_ContaLogins, FDataRecord do
+  begin
+    {Faz Update do registro na Tabela}
+    id := IdConta;
+    ShortDateFormat := 'yyyy/mm/dd';
+    CommandText :=
+      'UPDATE ' +
+      '  CONTALOGIN ' +
+      'SET ' +
+      '  NOME = ' + #39 + Nome + #39 + ',' +
+      '  SENHA = ' + #39 + Senha + #39 + ',' +
+      '  IDGRUPO = ' + IntToStr(GrupoLogin.IdGrupo) + ',' +
+      '  USERNAME = ' + #39 + UserName + #39 + ' ' +
+      'WHERE ' +
+      '  IDCONTA = ' + IntToStr(IdConta);
+    ShortDateFormat := 'dd/mm/yyyy';
+    try
+      Execute;
+    except
+      on E: Exception do
+      begin
+        with Application do
+          MessageBox(PChar(MSG_ERROUPDATE + E.Message),
+                     CAP_ERRODB,MB_OKICONSTOP);
+        FState := stRead;
+        Screen.Cursor := crDefault;
+        Self.Refresh;
+        Locate('IdConta', id,[]);
+        Self.Read;
+        exit;
+      end;
+    end;
+    Self.Refresh;
+    {posiciona no registro}
+    Locate('IdConta', id,[]);
+    Self.Read;
+  end;
+end;
+
+procedure TContaLogins.PostDelete;
+var id: Integer;
+begin
+  FState := stDBWait;
+  with DataModule_Biblio.ADOCommand_ContaLogins, FDataRecord do
+  begin
+    id := DataModule_Biblio.ADODataSet_ContaLogins.RecNo;
+    DataModule_Biblio.ADODataSet_ContaLogins.Close;
+    {apaga registro na Tabela}
+    CommandText :=
+      'DELETE FROM ' +
+      '  CONTALOGIN ' +
+      'WHERE ' +
+      '  IDCONTA = ' + IntToStr(IdConta);
+    try
+      Execute;
+    except
+      on E: Exception do
+      begin
+        with Application do
+          MessageBox(PChar(MSG_ERRODELETE + E.Message),
+                     CAP_ERRODB,MB_OKICONSTOP);
+        FState := stRead;
+        Self.Refresh;
+        GotoReg(id);
+        Self.Read;
+        Screen.Cursor := crDefault;
+        exit;
+      end;
+    end;
+  end;
+  Self.Refresh;
+  if id - 1 > 0 then
+    GotoReg(id - 1);
+  Self.Read;
+end;
+
+procedure TContaLogins.Post;
+begin
+  {grava o registro atual no banco de dados}
+  if (FState = stRead) or (FState = stDBWait) then
+    exit;
+  Screen.Cursor := crSQLWait;
+  case FState of
+    stInsert: PostInsert;
+    stDelete: PostDelete;
+    stEdit: PostEdit;
+  end;
+  FState := stRead;
+  Screen.Cursor := crDefault;
+end;
+
+procedure TContaLogins.LocateUserName(UserName: String);
+begin
+  {posiciona no registro}
+  with DataModule_Biblio.ADODataSet_ContaLogins do
+    Locate('UserName', UserName,[]);
+  Self.Read;
+end;
+
+function TContaLogins.Exists(UserName: String): Boolean;
+var i: Integer;
+begin
+  {retorna True se conta login existe}
+  Result := False;
+  if RecCount = 0 then
+    exit;
+  for i := 1 to RecCount do
+  begin
+    GotoReg(i);
+    if Registro.UserName = UserName then
+    begin
+      Result := True;
+      break;
+    end;
+  end;
+end;
+
+{-------------------- TRegistroLogin -----------------------}
+
+procedure TRegistroLogin.Login(IdConta: Integer);
+begin
+  with DataModule_Biblio.ADODataSet_RegLogin,
+       DataModule_Biblio.ADOCommand_RegLogin do
+  begin
+    Close;
+    CommandText :=
+      'SELECT ' +
+      '  DATAHORA, IDCONTA ' +
+      'FROM ' +
+      '  REGLOGIN ' +
+      'ORDER BY DATAHORA';
+    RecordSet := Execute;
+    Open;
+    Last;
+    if FieldByName('IDCONTA').AsInteger <> IdConta then
+    begin
+      Close;
+      CommandText :=
+        'INSERT INTO ' +
+        '  REGLOGIN ' +
+        '  (OPERACAO, IDCONTA, DATAHORA) ' +
+        'VALUES ' +
+        '  (' + #39 + 'LOGIN' + #39 + ', ' +
+        IntToStr(IdConta) + ', ' + #39 + DateTimeToStr(Now) + #39 + ')';
+      Execute;
+    end;
+    Close;
+  end;
+end;
+
 {-------------------- TDataModule_Biblio -----------------------}
 
 procedure TDataModule_Biblio.DataModuleCreate(Sender: TObject);
 var Path: String;
+    FGrupoLogins: TGrupoLogins;
+    FDireitos: TDireitos;
+    FContaLogins: TContaLogins;
     FTipoUsuarios: TTipoUsuarios;
     FTipoFornecedores: TTipoFornecedores;
     FTipoAcervos: TTipoAcervos;
@@ -2951,12 +4031,13 @@ begin
   {Faz a conexão ao Banco de Dados}
   Screen.Cursor := crSQLWait;
   ADOConnection_Biblio.ConnectionString :=
-    'Provider=Microsoft.Jet.OLEDB.4.0;User ID=Admin;' +
-    'Data Source=' + Path + 'biblio.mdb;' +
-    'Mode=ReadWrite;Extended Properties="";Persist Security Info=False;' +
-    'Jet OLEDB:System database="";Jet OLEDB:Registry Path="";' +
-    'Jet OLEDB:Database Password="";Jet OLEDB:Engine Type=5;' +
-    'Jet OLEDB:Database Locking Mode=1;Jet OLEDB:Global Partial Bulk Ops=2;' +
+    'Provider=Microsoft.Jet.OLEDB.4.0;Password=biblio fbai;User ID=bibliouser;' +
+    'Data Source=' + Path + 'biblio.mdb;Mode=ReadWrite|Share Deny None;' +
+    'Extended Properties="";Persist Security Info=True;' +
+    'Jet OLEDB:System database=' + Path + 'biblio.mdw;' +
+    'Jet OLEDB:Registry Path="";Jet OLEDB:Database Password="";' +
+    'Jet OLEDB:Engine Type=5;Jet OLEDB:Database Locking Mode=1;' +
+    'Jet OLEDB:Global Partial Bulk Ops=2;' +
     'Jet OLEDB:Global Bulk Transactions=1;Jet OLEDB:New Database Password="";' +
     'Jet OLEDB:Create System Database=False;Jet OLEDB:Encrypt Database=False;' +
     'Jet OLEDB:Don' + #39 + 't Copy Locale on Compact=False;' +
@@ -2974,6 +4055,114 @@ begin
       end;
     end;
   end;
+  {cria os grupos de login padrão do sistema, se não existirem}
+  FGrupoLogins := TGrupoLogins.Create;
+  FDireitos := TDireitos.Create;
+  with FGrupoLogins do
+  begin
+    Refresh;
+    if not Exists('ADMINISTRADORES') then
+    begin
+      Insert;
+      Registro.Descricao := 'ADMINISTRADORES';
+      with FDireitos do
+      begin
+        VerCadUsuarios := True;
+        VerCadFornecedores := True;
+        VerCadAcervo := True;
+        VerPainelControle := True;
+        VerExplorer := True;
+        VerRelatorios := True;
+        AlterarCadUsuarios := True;
+        AlterarCadFornecedores := True;
+        AlterarCadAcervo := True;
+        Emprestar := True;
+        Devolver := True;
+        MoverPerdido := True;
+        Reservar := True;
+      end;
+      Registro.SetPermissoes(FDireitos);
+      Post;
+    end;
+    if not Exists('BIBLIOTECÁRIOS') then
+    begin
+      Insert;
+      Registro.Descricao := 'BIBLIOTECÁRIOS';
+      with FDireitos do
+      begin
+        VerCadUsuarios := True;
+        VerCadFornecedores := True;
+        VerCadAcervo := True;
+        VerPainelControle := False;
+        VerExplorer := True;
+        VerRelatorios := True;
+        AlterarCadUsuarios := True;
+        AlterarCadFornecedores := True;
+        AlterarCadAcervo := True;
+        Emprestar := True;
+        Devolver := True;
+        MoverPerdido := True;
+        Reservar := True;
+      end;
+      Registro.SetPermissoes(FDireitos);
+      Post;
+    end;
+    if not Exists('ALUNOS') then
+    begin
+      Insert;
+      Registro.Descricao := 'ALUNOS';
+      with FDireitos do
+      begin
+        VerCadUsuarios := False;
+        VerCadFornecedores := False;
+        VerCadAcervo := True;
+        VerPainelControle := False;
+        VerExplorer := True;
+        VerRelatorios := False;
+        AlterarCadUsuarios := False;
+        AlterarCadFornecedores := False;
+        AlterarCadAcervo := False;
+        Emprestar := False;
+        Devolver := False;
+        MoverPerdido := False;
+        Reservar := False;
+      end;
+      Registro.SetPermissoes(FDireitos);
+      Post;
+    end;
+    Free;
+  end;
+  FDireitos.Free;
+  {cria as contas padrão do sistema, se não existirem}
+  FContaLogins := TContaLogins.Create;
+  FGrupoLogins := TGrupoLogins.Create;
+  FGrupoLogins.Refresh;
+  with FContaLogins do
+  begin
+    Refresh;
+    if not Exists('ALUNO') then
+    begin
+      Insert;
+      Registro.Nome := 'ALUNO DA ESCOLA';
+      Registro.UserName := 'ALUNO';
+      Registro.SetPassword('');
+      FGrupoLogins.LocateDescricao('ALUNOS');
+      Registro.GrupoLogin.Assign(FGrupoLogins.Registro);
+      Post;
+    end;
+    if not Exists('ADMIN') then
+    begin
+      Insert;
+      Registro.Nome := 'ADMINISTRADOR DO SISTEMA';
+      Registro.UserName := 'ADMIN';
+      Registro.SetPassword('');
+      FGrupoLogins.LocateDescricao('ADMINISTRADORES');
+      Registro.GrupoLogin.Assign(FGrupoLogins.Registro);
+      Post;
+    end;
+    Free;
+  end;
+  FGrupoLogins.Free;
   {cria os tipos de usuário padrão do sistema, se não existirem}
   FTipoUsuarios := TTipoUsuarios.Create;
   with FTipoUsuarios do

@@ -50,7 +50,7 @@ begin
   {exibe a dica dos ícones do Painel de Controle}
   with RichEdit_Descricao.Lines do
   begin
-    if Item.Caption = 'Aparência da Área de Trabalho' then
+    if Item.Caption = 'Aparência' then
     begin
       if Painel = 'Aparencia' then
         exit;
@@ -61,18 +61,18 @@ begin
         'Cores da Área de Trabalho e do Papel de Parede.';
       Painel := 'Aparencia';
     end;
-    if Item.Caption = 'Opções de Cadastro' then
+    if Item.Caption = 'Configuração dos Cadastros' then
     begin
       if Painel = 'Cadastro' then
         exit;
       Clear;
       Text :=
-        'OPÇÕES DE CADASTRO' + #13#10#13#10 +
+        'CONFIGURAÇÃO DOS CADASTROS' + #13#10#13#10 +
         'Altera as Opções dos Cadastros (Tipos de Usuário, Fornecedor, ' +
         'Acervo, etc).';
       Painel := 'Cadastro';
     end;
-    if Item.Caption = 'Diretivas de Grupos e Contas de Login' then
+    if Item.Caption = 'Grupos e Contas de Login' then
     begin
       if Painel = 'Login' then
         exit;
@@ -89,20 +89,20 @@ end;
 procedure Tform_PainelDeControle.ListView_IconesClick(Sender: TObject);
 begin
   {abre os forms correspondentes ao ícone clicado}
-  if ListView_Icones.Selected.Caption = 'Aparência da Área de Trabalho' then
+  if ListView_Icones.Selected.Caption = 'Aparência' then
   begin
     form_AparenciaDialog := Tform_AparenciaDialog.Create(Self);
     form_AparenciaDialog.Configura(form_Desktop.Desktop_Desktop);
     FreeAndNil(form_AparenciaDialog);
   end;
-  if ListView_Icones.Selected.Caption = 'Opções de Cadastro' then
+  if ListView_Icones.Selected.Caption = 'Configuração dos Cadastros' then
   begin
     form_CadastroOpcoesDialog := Tform_CadastroOpcoesDialog.Create(Self);
     form_CadastroOpcoesDialog.ShowModal;
     FreeAndNil(form_CadastroOpcoesDialog);
   end;
   if ListView_Icones.Selected.Caption =
-     'Diretivas de Grupos e Contas de Login' then
+     'Grupos e Contas de Login' then
   begin
     form_ContasDialog := Tform_ContasDialog.Create(Self);
     form_ContasDialog.ShowModal;

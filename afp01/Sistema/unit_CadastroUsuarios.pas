@@ -134,6 +134,8 @@ var
 
 implementation
 
+uses unit_Desktop;
+
 {$R *.DFM}
 
 {-------------------- TDataInterface -----------------------}
@@ -358,6 +360,8 @@ begin
     else if (Length(Edit_RGA.Text) = 0) and
             (UpperCase(Items[ItemIndex]) = 'ALUNO') then
       ExibeMensagem(Edit_RGA,MSG_NORGA,CAP_NOALL,MB_OKWARNING)
+    else if DataInterface.FDataClass.Exists(Edit_RGA.Text) then
+      ExibeMensagem(Edit_RGA,MSG_EXISTERGA,CAP_NOALL,MB_OKWARNING)
     else
       Result := True;
   end;
@@ -372,10 +376,10 @@ begin
   {Evento OnCreate do Form}
   {Cria o objeto da classe de Interface}
   DataInterface := TDataInterface.Create;
-  DataInterface.Read(Self);
   DataInterface.ReadTipos(Self);
   ComboBox_TipoUsuario.ItemIndex := 0;
-  FAccessRW := True;
+  DataInterface.Read(Self);
+  SetAccess(form_Desktop.Direitos.AlterarCadUsuarios);
 end;
 
 procedure Tform_CadastroUsuarios.FormDestroy(Sender: TObject);

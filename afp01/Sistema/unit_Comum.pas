@@ -14,7 +14,7 @@ unit unit_Comum;
 
 interface
 
-uses Windows, Forms, Sysutils, stdctrls;
+uses Windows, Forms, Sysutils, stdctrls, graphics;
 
 {************* Tipos de dados **************}
 
@@ -41,8 +41,14 @@ const
     MB_OK + MB_ICONSTOP;
   MB_OKWARNING =
     MB_OK + MB_ICONWARNING;
+  MB_OKINFORMATION =
+    MB_OK + MB_ICONINFORMATION;
+  MB_OKCANCELWARNING =
+    MB_OKCANCEL + MB_ICONWARNING;
   MB_YESNOQUESTION =
     MB_YESNO + MB_ICONQUESTION + MB_DEFBUTTON2;
+  MB_YESNOQUESTIONDEFYES =
+    MB_YESNO + MB_ICONQUESTION;
 
 {Constantes das mensagens}
   MSG_SEMDB =
@@ -79,6 +85,113 @@ const
     'Sistema.';
   CAP_SAIR =
     'Não foi possível sair do Sistema Biblioteca';
+  MSG_SAIRBBT =
+    'Tem certeza que deseja sair do Sistema Biblioteca ?';
+  CAP_SAIRBBT =
+    'Sair do Sistema Biblioteca';
+  MSG_LOGOFF =
+    'Há janelas abertas no Sistema Biblioteca. Feche-as antes de efetuar o ' +
+    'Logoff.';
+  CAP_LOGOFF =
+    'Não foi possível efetuar o Logoff no Sistema Biblioteca';
+  MSG_NOBAK =
+    'Há janelas abertas no Sistema Biblioteca. Feche-as antes de criar uma ' +
+    'Cópia de Segurança do Banco da Dados.';
+  CAP_NOBAK =
+    'Não é possível criar Cópia de Segurança';
+  MSG_NOREST =
+    'Há janelas abertas no Sistema Biblioteca. Feche-as antes de restaurar ' +
+    'uma Cópia de Segurança do Banco da Dados.';
+  CAP_NOREST =
+    'Não é possível restaurar Cópia de Segurança';
+  MSG_MINRES =
+    'O Sistema Biblioteca só funciona com uma resolução de vídeo de pelo ' +
+    'menos 800x600.' + #13#10 +
+    'Consulte a ajuda do Windows para saber como alterar a resolução do ' +
+    'vídeo.';
+  CAP_MINRES =
+    'Resolução de vídeo menor do que 800x600';
+  MSG_ERROLOGINR =
+    'A Senha está incorreta.' + #13#10 +
+    'Não foi possível realizar o Login, pois o número ' +
+    'de tentativas foi esgotado. Clique em OK para fechar o programa.';
+  CAP_ERROLOGINR =
+    'Esgotado número máximo de tentativas';
+  MSG_ERROLOGIN =
+    'A Senha está incorreta.' + #13#10 +
+    'Tente digitar novamente, lembrando que a Senha é ' +
+    'sensível a letras maiúsculas/minúsculas';
+  CAP_ERROLOGIN =
+    'Erro de Login';
+  MSG_PICPEQ =
+    'Não é possível usar esse arquivo como papel de parede, pois suas ' +
+    'dimensões são menores do que as dimensões da tela.' + #13#10 +
+    'Tente procurar outro arquivo.';
+  CAP_PICPEQ =
+    'Imagem muito pequena';
+
+  CAP_ERROBAKALL =
+    'Erro na criação da Cópia de Segurança';
+  MSG_ERROLEBAK =
+    'Não foi possível ler o arquivo do Banco de Dados.' + #13#10 + 'Erro: ';
+  MSG_ERROTMPBAK =
+    'Não foi possível gravar o arquivo temporário.' + #13#10 + 'Erro: ';
+  MSG_ERROZIPBAK =
+    'Não foi possível compactar o arquivo do Banco de Dados.' +
+    #13#10 + 'Erro: ';
+  CAP_ERROREALL =
+    'Erro na restauração da Cópia de Segurança';
+  MSG_ERROLERE =
+    'Não foi possível ler o arquivo compactado da Cópia de Segurança.' +
+    #13#10 + 'Erro: ';
+  MSG_ERROTMPRE =
+    'Não foi possível sobrescrever o arquivo do Banco de Dados.' + #13#10 +
+    'Erro: ';
+  MSG_ERROZIPRE =
+    'Não foi possível descompactar o arquivo da Cópia de Segurança.' +
+    #13#10 + 'Erro: ';
+  MSG_INSDISCO =
+    'Insira um disco vazio e desprotegido contra gravação na unidade ';
+  MSG_INSDISCOR =
+    'Insira o disco da cópia de segurança na unidade ';
+  MSG_INSDISCO2 =
+    ': e clique em OK. ' + #13#10 + 'Clique em Cancelar para sair.';
+  CAP_INSDISCO =
+    'Disco inválido';
+  MSG_EXISTBAK =
+    'Já existe no disco uma Cópia de Segurança realizada hoje.' + #13#10;
+  MSG_VDSKBAK =
+    'Serão necessários ';
+  MSG_VDSKBAK2 =
+    ' discos para criar a Cópia de Segurança. Deseja Continuar?';
+  CAP_VDSKBAK =
+    'Mais de um disco necessário';
+  MSG_INSDISCON =
+    'Insira o disco onde será gravado o volume ';
+  MSG_INSDISCON2 =
+    ' da Cópia de Segurança do Banco de Dados.' + #13#10 +
+    'Clique em OK quando estiver pronto ou em Cancelar para sair.';
+  CAP_INSDISCON =
+    'Inserir disco';
+  MSG_INSDISCONRE =
+    'Insira o disco ';
+  MSG_OKBAK =
+    'A Cópia de Segurança do Banco de Dados foi criada com sucesso.';
+  CAP_OKBAK =
+    'Concluído';
+  MSG_OKRE =
+    'A Cópia de Segurança do Banco de Dados foi restaurada com sucesso.';
+  MSG_RESTAURAR =
+    'ATENÇÃO! A Restauração da Cópia de Segurança APAGARÁ TODOS OS DADOS ' +
+    'EXISTENTES no Banco de Dados Atual, e NÃO HAVERÁ NENHUMA FORMA DE ' +
+    'REVERTER O PROCESSO. Tem certeza que deseja continuar ?';
+  CAP_RESTAURAR =
+    'Confirmação da restauração do BD';
+  MSG_AUTOLOGOFF =
+    'Somente a Conta abaixo poderá desbloquear o Sistema Biblioteca:' +
+    #13#10 + 'Conta de Login: ';
+  CAP_AUTOLOGOFF =
+    'Sistema Bloqueado';
 
   CAP_NOALL =
     'Informações incompletas ou incorretas';
@@ -98,6 +211,8 @@ const
     'O CPF digitado é inválido. Digite o CPF correto.';
   MSG_NORGA =
     'O campo "RGA" não pode estar em branco. Digite o RGA.';
+  MSG_EXISTERGA =
+    'O valor digitado no campo "RGA" já existe. Digite outro número de RGA.';
   MSG_EXCLUIRUSUARIO =
     'Tem certeza que deseja excluir o Usuário do cadastro ?' + #13#10 +
     '(esta operação não poderá ser desfeita).';
@@ -233,7 +348,46 @@ const
     'Sistema Biblioteca.';
   CAP_MUITOSCA =
     'Limite Máximo de Classificações de Acervo';
-    
+  {constantes usadas pelo cadastro grupos login}
+  MSG_NODESCRICAOG =
+    'O campo "Descrição" não pode estar em branco. Digite a Descrição do ' +
+    'Grupo de Login.';
+  MSG_EXCLUIRGRUPO =
+    'Tem certeza que deseja excluir o Grupo de Login selecionado ?' + #13#10 +
+    '(esta operação não poderá ser desfeita).';
+  CAP_EXCLUIRGRUPO =
+    'Excluir Grupo de Login';
+  MSG_ADESCRICAOGRUPO =
+    'Já existe um Grupo de Login com esse nome. Altere o campo "Descrição".';
+  CAP_ADESCRICAOGRUPO =
+    'Grupo de Login duplicado';
+  MSG_NOEXCLUIRGRUPO =
+    'Não é possível alterar ou excluir os Grupos de Login pré-definidos ' +
+    'pelo Sistema Biblioteca (ADMINISTRADORES, BIBLIOTECÁRIOS e ALUNOS).';
+  CAP_NOEXCLUIRGRUPO =
+    'Grupo de Login criado pelo Sistema';
+  {constantes usadas pelo cadastro contas login}
+  MSG_NODESCRICAOC =
+    'O campo "Conta" não pode estar em branco. Digite o Nome da ' +
+    'Conta de Login.';
+  MSG_EXCLUIRCONTA =
+    'Tem certeza que deseja excluir a Conta de Login selecionada ?' + #13#10 +
+    '(esta operação não poderá ser desfeita).';
+  CAP_EXCLUIRCONTA =
+    'Excluir Conta de Login';
+  MSG_ADESCRICAOCONTA =
+    'Já existe uma Conta de Login com esse nome. Altere o campo "Conta".';
+  CAP_ADESCRICAOCONTA =
+    'Conta de Login duplicada';
+  MSG_NOEXCLUIRCONTA =
+    'Não é possível alterar ou excluir as Contas de Login pré-definidas ' +
+    'pelo Sistema Biblioteca (ADMIN e ALUNO).';
+  CAP_NOEXCLUIRCONTA =
+    'Conta de Login criada pelo Sistema';
+  MSG_NOSENHAC =
+    'A senha digitada não confere. Digite a mesma senha nos campos "Senha" e ' +
+    '"Confirmação da Senha"';
+
 {************* Rotinas e Funções **************}
 
 {Converte uma UF (sigla) em uma string com o Estado}
@@ -242,8 +396,14 @@ function UFToEstado(UF: String): String;
 function EstadoToUF(Estado: String): String;
 {Retorna True se outra instância da aplicação está rodando}
 function SystemRunning: Boolean;
+{retorna True se a resolução de tela é pelo menos 800x600}
+function MinRes800x600: Boolean;
+{retorna True se o tamanho do Picture é pelo menos igual a resolução da tela}
+function PictSizeOK(Picture: TPicture): Boolean;
 {converte um Boolean em uma String reconhecida pelo Access}
 function BoolToAccessStr(Booleano: Boolean): String;
+{converte um Boolean em um Inteiro}
+function BoolToInt(Booleano: Boolean): Integer;
 {Consiste número de CPF}
 function ConsisteCPF(CPFString: String): Boolean;
 {Consiste On-Line os campos apenas numéricos (inteiros) no OnChange}
@@ -385,6 +545,24 @@ begin
     Result := True;
 end;
 
+function MinRes800x600: Boolean;
+begin
+  {retorna True se a resolução de tela é pelo menos 800x600}
+  if Screen.Width >= 800 then
+    Result := True
+  else
+    Result := False;
+end;
+
+function PictSizeOK(Picture: TPicture): Boolean;
+begin
+  {retorna True se o tamanho do Picture é pelo menos igual a resolução da tela}
+  if (Picture.Width < Screen.Width) or (Picture.Height < Screen.Height) then
+    Result := False
+  else
+    Result := True;
+end;
+
 function BoolToAccessStr(Booleano: Boolean): String;
 begin
   {converte um Boolean em uma String reconhecida pelo Access}
@@ -392,6 +570,15 @@ begin
     Result := '-1'
   else
     Result := '0';
+end;
+
+function BoolToInt(Booleano: Boolean): Integer;
+begin
+  {converte um Boolean em um Inteiro}
+  if Booleano then
+    Result := 1
+  else
+    Result := 0;
 end;
 
 function ConsisteCPF(CPFString: String): Boolean;
@@ -478,9 +665,8 @@ begin
     i := 1;
     while i <= Length(Text) do
     begin
-      if (Ord(Text[i]) < 32) or (Ord(Text[i]) > 199) or
-         ((Ord(Text[i]) > 122) and (Ord(Text[i]) < 128)) or
-         ((Ord(Text[i]) > 32) and (Ord(Text[i]) < 65)) then
+      if (Ord(Text[i]) < 32) or 
+         ((Ord(Text[i]) > 122) and (Ord(Text[i]) < 128)) then
       begin
         tmpstr := Text;     {qualquer caracter que não seja Literal é apagado}
         Delete(tmpstr,i,1);
